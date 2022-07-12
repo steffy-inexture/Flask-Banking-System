@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+{% block content %}
+<main role="main" class="container">
+    <div class="row">
+        <div class="col-md-12" style="background-color:rgb(39, 45, 83);color:white;padding:20px">
+            W e l c o m e !!! to the user's dashboard
+        </div>
+    </div>
+    <br>
+    <hr>
+    <div class="container">
+        <pre
+            style="background-color: black; color:aliceblue">&nbsp;&nbsp;&nbsp;&nbsp;As a user you have this many options available :</pre>
+        <hr>
+        <button><a href="{{ url_for('users.change_branch') }}">Change the bank branch</a></button>&nbsp;&nbsp;
+        <button><a href="{{ url_for('users.request_card') }}">Card request</a></button>&nbsp;&nbsp;
+        <button><a href="{{ url_for('users.apply_loan') }}">Loan Request</a></button>&nbsp;&nbsp;
+        <button><a href="{{ url_for('users.request_insurance') }}">Insurance Request</a></button>&nbsp;&nbsp;
+        <button><a href="{{ url_for('users.add_fixed_deposit') }}">Add Fixed deposits</a></button>
+        <hr>
+        <button><a href="{{ url_for('users.add_money') }}">Transfer to other user</a></button>&nbsp;&nbsp;&nbsp;
+        <button><a href="{{ url_for('users.transfer_money') }}">Transfer money in your account</a></button>
+        <button><a href="{{ url_for('users.fd_interest_money') }}">Apply to get Fd interest</a></button>
+        <hr>
+        <button><a href="{{ url_for('users.bank_statement') }}">Bank statement</a></button>&nbsp;&nbsp;&nbsp;&nbsp;
+        <button><a href="{{ url_for('users.bank_statement_pdf') }}">Download bank statement</a></button>
+        <br>
+        <hr>
+        <pre style="background-color: black; color:aliceblue">&nbsp;&nbsp;&nbsp;&nbsp;This is all your detail :</pre>
+        <hr>
+        <div class="container">
+
+
+            <div class="row">
+                <div class="col-md-4" style="text-align:left">
+
+                    <h5 style="text-align: left;">Account Detail</h5>
+                    <h6>account number: &nbsp;&nbsp;{{ account.account_number }}</h6>
+                    <h6>account status: &nbsp;&nbsp; {{ account.account_status }}</h6>
+                    <h6>account balance: &nbsp;&nbsp; {{ account.account_balance }}</h6>
+                    <h6>saving balance: &nbsp;&nbsp; {{ account.saving_balance }}</h6>
+                    <h6>account creation date: &nbsp;&nbsp; {{ account.account_creation_date }}</h6>
+                    <h6>Branch id: &nbsp;&nbsp; {{ account.branch_id }}</h6>
+                </div>
+
+                <div class="col-md-4" style="text-align:left">
+
+                    <h5 style="text-align: left;">Card Detail</h5>
+                    <h6>Account number: &nbsp;&nbsp;{{ card.account_number }}</h6>
+                    <h6>Card number: &nbsp;&nbsp;{{ card.card_number }}</h6>
+                    <h6>Cvv number: &nbsp;&nbsp;{{ card.cvv_number }}</h6>
+                    <h6>Card PIN: &nbsp;&nbsp;{{ card.card_pin }}</h6>
+                    <h6>Creation date: &nbsp;&nbsp;{{ card.creation_date }}</h6>
+                    <h6>Expiry date: &nbsp;&nbsp;{{ card.expiry_date }}</h6>
+                </div>
+            </div>
+            <br>
+            <br>
+            <div class="row">
+                <div class="col-md-4" style="text-align:left">
+                    <h5 style="text-align: left;">Loan Detail</h5>
+                    <h6>Loan id: {{loan.loan_id}}</h6>
+                    <h6>Loan amount: {{loan.loan_amount}}</h6>
+                    <h6>Loan status: {{loan.loan_status}}</h6>
+                    <h6>RAte interest: {{loan.rate_interest}}</h6>
+                    <h6>Paid amount: {{loan.paid_amount}}</h6>
+                    <h6>user id: {{loan.user_id}}</h6>
+                </div>
+                <div class="col-md-4" style="text-align:left">
+                    <h5 style="text-align: left;">Insurance Detail</h5>
+                    <h6>Insurance id: {{insurance.insurance_id}}</h6>
+                    <h6>Insurance amount: {{insurance.insurance_amount}}</h6>
+                    <h6>Insurance status: {{insurance.insurance_status}}</h6>
+                    <h6>user id: {{loan.user_id}}</h6>
+                </div>
+
+                <div class="col-md-4" style="text-align:left">
+                    <h5 style="text-align: left;">Fixed deposit Detail</h5>
+                    <h6>Fixed deposit id: {{fixed_deposit.fd_id}}</h6>
+                    <h6>Fixed deposit amount: {{fixed_deposit.fd_amount}}</h6>
+                    <h6>Fixed deposit status: {{fixed_deposit.fd_status}}</h6>
+                    <h6>RAte interest: {{fixed_deposit.rate_interest}}</h6>
+                    <h6>Added amount: {{fixed_deposit.added_amount}}</h6>
+                    <h6>account number: {{fixed_deposit.account_number}}</h6>
+                </div>
+            </div>
+
+            <hr style="background-color: black;">
+            <hr style="background-color: black;">
+            <div class="row">
+                <div class="col-md-4" style="text-align:center">
+                    {{account.saving_balance}}
+                    <hr>
+                    <button>saving balance</button>
+                </div>
+                <div class="col-md-4" style="text-align:center">
+                    {{account.account_balance}}
+                    <hr>
+                    <button>Current balance</button>
+                </div>
+                <div class="col-md-4" style="text-align:center">
+                    {{fixed_deposit.fd_amount}}
+                    <hr>
+                    <button>Total fixed deposits balance</button>
+                </div>
+
+            </div>
+            <br>
+            <hr>
+            <br>
+
+            <h4>
+            <pre style="background-color: black; color:aliceblue; text-align:left;">&nbsp;&nbsp;&nbsp;&nbsp;Bank statements :</pre>
+            </h4>
+            <h4>Name: {{current_user.user_name}}</h4>
+<!--            <h4>steffy</h4>-->
+            <h4>Email: {{current_user.user_email}}</h4>
+            
+            <table style="font-family: arial, sans-serif;
+            border-collapse: collapse;
+            width: 100%;">
+                <tr style="border: 1px solid #dddddd;
+                text-align: left;
+                padding: 8px;">
+                    <th style="border: 1px solid #dddddd;
+                    text-align: left;
+                    padding: 8px;">Transaction id</th>
+                    <th style="border: 1px solid #dddddd;
+                    text-align: left;
+                    padding: 8px;">Transaction date</th>
+                    <th style="border: 1px solid #dddddd;
+                    text-align: left;
+                    padding: 8px;">Transaction amount</th>
+                    <th style="border: 1px solid #dddddd;
+                    text-align: left;
+                    padding: 8px;">Sender id</th>
+                    <th style="border: 1px solid #dddddd;
+                    text-align: left;
+                    padding: 8px;">Reciever id</th>
+                    <th style="border: 1px solid #dddddd;
+                    text-align: left;
+                    padding: 8px;">Transaction type</th>
+                </tr>
+                {% for transaction in transaction %}
+                <tr style="border: 1px solid #dddddd;
+                text-align: left;
+                padding: 8px;">
+                    <td style="border: 1px solid #dddddd;
+                    text-align: left;
+                    padding: 8px;">{{transaction.transaction_id}}</td>
+                    <td style="border: 1px solid #dddddd;
+                    text-align: left;
+                    padding: 8px;">{{transaction.transaction_date}}</td>
+                    <td style="border: 1px solid #dddddd;
+                    text-align: left;
+                    padding: 8px;">{{transaction.transaction_amount}}</td>
+                    <td style="border: 1px solid #dddddd;
+                     text-align: left;
+                     padding: 8px;">{{transaction.sender_id}}</td>
+                    <td style="border: 1px solid #dddddd;
+                    text-align: left;
+                    padding: 8px;">{{transaction.receiver_id}}</td>
+                    {% for transaction_type in transaction_type %}
+                    {%if transaction_type.transaction_id==transaction.transaction_id %}
+                    <td style="border: 1px solid #dddddd;
+                    text-align: left;
+                    padding: 8px;">{{transaction_type.transaction_type}}</td>
+                    {%endif%}
+                    {% endfor %}
+                </tr>
+
+                {% endfor %}
+
+            </table>
+            <hr>
+        </div>
+    </div>
+</main>
+{% endblock content %}

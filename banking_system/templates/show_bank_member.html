@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block content %}
+<a href="{{url_for('admin.admin_dashboard')}}"><button>Go back</button></a>
+<br>
+<hr>
+<div class="row">
+          <br>
+            <br>
+            <div class="col-md-12" style="text-align:center;border:solid;padding:15px;">
+                <h5 style="text-align: center;background:black;color:white;">user's Loan Data</h5>
+                <table style="text-align:left">
+                    <tr>
+
+                        <th style="text-align:left"><pre>Name     </pre></th>&nbsp;
+                        <th style="text-align:left"><pre>Position  </pre></th>&nbsp;
+                        <th style="text-align:left"><pre>About this person  </pre></th>&nbsp;
+                        <th style="text-align:left"><pre>email id</pre></th>
+                        <th style="text-align:left"><pre>Contact   </pre></th>
+                        <th style="text-align:left"><pre>Delete   </pre></th>
+                    </tr>
+
+                    {% for member in member %}
+                        <tr>
+                            <td style="text-align:left"><pre>{{member.bank_member_name}}     </pre></td>&nbsp;
+                            <td style="text-align:left"><pre>{{member.bank_member_position}}     </pre></td>&nbsp;
+                            <td style="text-align:left"><pre>{{ member.bank_member_about|truncate(55, True, '...')}}     </pre></td>&nbsp;
+                            <td style="text-align:left"><pre>{{member.bank_member_email_id}}     </pre></td>&nbsp;
+                            <td style="text-align:left"><pre>{{member.bank_member_contact}}     </pre></td>&nbsp;
+                            <td><a href="{{url_for(
+                            'admin.delete_bank_member',
+                            member_id=member.bank_member_id,
+                            member_position=member.bank_member_position
+                            )}}"><button>Delete</button></a></td>
+                        </tr>
+
+                    {% endfor %}
+
+
+                </table>
+                <hr>
+                <a href="{{url_for('admin.bank_about_member')}}"><button>Add other Bank Member</button></a>
+            </div>
+    </div>
+{% endblock content %}

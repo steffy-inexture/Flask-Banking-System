@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.form/4.3.0/jquery.form.min.js"
+            integrity="sha384-qlmct0AOBiA2VPZkMY3+2WqkHtIQ9lSdAsAn5RUJD/3vA5MKDgSGcdmIv4ycVxyn"
+            crossorigin="anonymous"></script>
+</head>
+<body>
+<div class="container">
+    <br/>
+    <div class="table-responsive">
+        <div class="table-responsive">
+            <div id="targetLayer" class="btn btn-success" style="display:none;width:100%;margin-bottom: 10px;"></div>
+            <div id="loader-icon" style="display:none;"><img src="/static/img/loader.gif"/></div>
+            <form id="deleteall" action="/delete" method="post">
+                All bank member role details:
+                <table class="table table-bordered">
+                    <thead>
+                    <tr>
+                        <th width="5%">
+                            <input type="submit" value="Delete" name="delete_all" id="delete_all"
+                                   class="btn btn-danger btn-xs"/>
+                        <th>id</th>
+                        <th>role name</th>
+                    </tr>
+                    </thead>
+
+                    {% for role in roles.items %}
+                    <tr>
+                        <td>
+                            <input type="checkbox" name="checkdelete" id="checkdelete" class="delete_checkbox"
+                                   value="{{role.id}}"/>
+                        </td>
+                        <td>
+                            <pre>{{role.id}}   </pre>
+                        </td>&nbsp;
+                        <td>
+                            <pre>{{role.member_role}}   </pre>
+                        </td>&nbsp;
+                    </tr>
+                    {% endfor %}
+
+                </table>
+                {% for page_num in roles.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+                {% if page_num %}
+                {% if roles.page == page_num %}
+                <a href="{{ url_for('admin.show_member_role_list', page=page_num)}}">{{page_num}}</a>
+                {% else %}
+
+                <a href="{{ url_for('admin.show_member_role_list', page=page_num)}}">{{page_num}}</a>
+                {% endif %}
+                {% else %}
+                ...
+                {% endif %}
+                {% endfor %}
+                <hr>
+                <a href="{{url_for('admin.member_role_list')}}" style="text-align:left">Add new Bank member role</a>
+            </form>
+        </div>
+    </div>
+</div>
+<style>
+.removeRow {background-color: #64b418;color:#FFFFFF;}
+
+</style>
+<script>
+$(document).ready(function(){
+    $('.delete_checkbox').click(function(){
+        if($(this).is(':checked')) {
+            $(this).closest('tr').addClass('removeRow');
+        }else{
+            $(this).closest('tr').removeClass('removeRow');
+        }
+    });
+    $('#deleteall').submit(function(event){
+        if($('#checkdelete').val()){
+            event.preventDefault();
+            $('#loader-icon').show();
+            $('#targetLayer').hide();
+            $(this).ajaxSubmit({
+                target: '#targetLayer',
+                success:function(data){
+                    $('.removeRow').fadeOut(1500);
+                    $('#loader-icon').hide();
+                    $('#targetLayer').show();
+                    $('#targetLayer').html(data);
+                },
+                resetForm: true
+            });
+        }
+        return false;
+    });
+});
+
+</script>
+</body>
+</html>

@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block content %}
+<a href="{{url_for('admin.admin_dashboard')}}"><button>Go back</button></a>
+<br>
+<hr>
+<div class="col-md-4" style="text-align:center;border:solid;padding:15px;">
+
+                <h5 style="text-align: center;;background:black;color:white;">bank branch's Data</h5>
+                <table style="text-align:left">
+                    <tr >
+                    <th style="text-align:left"><pre>id     </pre></th>&nbsp;
+                    <th style="text-align:left"><pre>Branch name   </pre></th>&nbsp;
+                    <th style="text-align:left"><pre>Branch address   </pre></th>
+                    </tr>
+
+                    {% for branch in branchs.items %}
+                    <tr>
+                        <td><pre>{{branch.branch_id}}   </pre></td>&nbsp;
+                        <td><pre>{{branch.branch_name}}    </pre></td>&nbsp;
+                        <td><pre>{{branch.branch_address}}   </pre></td>&nbsp;
+                    </tr>
+                    {% endfor %}
+
+                </table>
+
+                {% for page_num in branchs.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2)  %}
+                            {% if page_num %}
+                                {% if branchs.page == page_num %}
+                <a href="{{ url_for('admin.admin_branch_data', page=page_num)}}"><button>{{page_num}}</button></a>
+                                {% else %}
+
+                <a href="{{ url_for('admin.admin_branch_data', page=page_num)}}"><button>{{page_num}}</button></a>
+                                {% endif %}
+                            {% else %}
+                                ...
+                            {% endif %}
+
+                        {% endfor %}
+                <hr>
+                <a href="{{url_for('admin.add_branch')}}"><button>Add new Bank branch</button></a>
+
+            </div>
+
+{% endblock content %}

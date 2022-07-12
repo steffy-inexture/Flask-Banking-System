@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block content %}
+<a href="{{url_for('admin.admin_dashboard')}}"><button>Go back</button></a>&nbsp;&nbsp;&nbsp;&nbsp;
+NOTE: YOU CAN ONLY DELETE USER IF THEY HAVE 0.0 ACCOUNT BALANCE
+<br>
+<hr>
+<div class="container">
+
+    </button>
+    <div class="row">
+          <br>
+            <br>
+            <div class="col-md-6" style="text-align:center;border:solid;padding:15px;">
+                <h5 style="text-align: center;background:black;color:white;">bank user's Data</h5>
+                <table style="text-align:left">
+                    <tr >
+                        <th style="text-align:left"><pre>id     </pre></th>&nbsp;
+                        <th style="text-align:left"><pre>User name  </pre></th>&nbsp;
+                        <th style="text-align:left"><pre>Account status   </pre></th>
+                        <th style="text-align:left"><pre>Delete user   </pre></th>
+                    </tr>
+                    {% for user in users.items %}
+                    {% if user.user_email!='steffy.inexture@gmail.com' %}
+                    <tr>
+                        <td><pre>{{user.user_id}}   </pre></td>&nbsp;
+                        <td><pre>{{user.user_name}}  </pre></td>&nbsp;
+                        {% for account in accounts%}
+                        {% if account.user_id==user.user_id %}
+                        <td><pre><button><a href="{{url_for('admin.account_status',
+                                                    user_id=user.user_id,
+                                                    user_name=user.user_name,
+                                                    account_number=account.account_number)}}">{{account.account_status}}</a></button>   </pre></td>&nbsp;
+
+                        {% if account.account_balance!=0.0 %}
+                        <td><pre><button>not delete</button> </pre></td>
+                        {% else %}
+                        <td><pre><button><a href="{{url_for('admin.delete_user',
+                                                    user_id=user.user_id)}}">delete</button> </pre></td>
+                        {% endif %}
+                        {% endif %}
+
+                        {% endfor%}
+
+
+                        <td><pre>  </pre></td>&nbsp;
+                    </tr>
+                    {%endif%}
+                    {% endfor %}
+                </table>
+==============
+                {% for page_num in users.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2)  %}
+                            {% if page_num %}
+                                {% if users.page == page_num %}
+                <a href="{{ url_for('admin.admin_user_data', page=page_num)}}"><button>{{page_num}}</button></a>
+                                {% else %}
+
+                <a href="{{ url_for('admin.admin_user_data', page=page_num)}}"><button>{{page_num}}</button></a>
+                                {% endif %}
+                            {% else %}
+                                ...
+                            {% endif %}
+
+                        {% endfor %}=================
+                <hr>
+                <a href="{{url_for('users.register')}}"><button>Add new User</button></a>
+            </div>
+    </div>
+</div>
+{% endblock content %}

@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% block content %}
+<a href="{{url_for('admin.admin_dashboard')}}"><button>Go back</button></a>
+<br>
+<hr>
+<div class="row">
+          <br>
+            <br>
+            <div class="col-md-12" style="text-align:center;border:solid;padding:15px;">
+                <h5 style="text-align: center;background:black;color:white;">user's Loan Data</h5>
+                <table style="text-align:left">
+                    <tr>
+
+                        <th style="text-align:left"><pre>User id     </pre></th>&nbsp;
+                        <th style="text-align:left"><pre>User name  </pre></th>&nbsp;
+                        <th style="text-align:left"><pre>Account number  </pre></th>&nbsp;
+                        <th style="text-align:left"><pre>FD id   </pre></th>
+                        <th style="text-align:left"><pre>FD amount   </pre></th>
+                        <th style="text-align:left"><pre>Rate interest   </pre></th>
+                        <th style="text-align:left"><pre>ADDED amount   </pre></th>
+                        <th style="text-align:left"><pre>FD status   </pre></th>
+                        <th style="text-align:left"><pre>FD approval   </pre></th>
+
+                    </tr>
+
+                    {% for user in users %}
+                        {% for account in account %}
+                            {% if account.user_id== user.user_id %}
+                                {% for fd in fds %}
+                                    {% if fd.account_number==account.account_number %}
+                                    <tr>
+                                        <th style="text-align:left"><pre>{{user.user_id}}     </pre></th>&nbsp;
+                                        <th style="text-align:left"><pre>{{user.user_name}}     </pre></th>&nbsp;
+                                        <th style="text-align:left"><pre>{{account.account_number}}     </pre></th>&nbsp;
+                                        <th style="text-align:left"><pre>{{fd.fd_id}}     </pre></th>&nbsp;
+                                        <th style="text-align:left"><pre>{{fd.fd_amount}}     </pre></th>&nbsp;
+                                        <th style="text-align:left"><pre>{{fd.rate_interest}}     </pre></th>&nbsp;
+                                        <th style="text-align:left"><pre>{{fd.added_amount}}     </pre></th>&nbsp;
+                                        <th style="text-align:left"><pre><a href="{{url_for('admin.update_fd_status',
+                                                                    user_id=user.user_id)}}">x<button>{{fd.fd_status}}     </button></a></pre></th>&nbsp;
+                                        {% if fd.fd_amount==0.0 %}
+                                        <td><pre><button>not delete</button> </pre></td>
+                                        {% else %}
+                                        <td><pre><button id="demodelete")>delete</button> </pre></td>
+<!--                                        <p id="demo"></p>-->
+
+                                        <a id="delete" href="{{url_for('admin.delete_fd',user_id=user.user_id)}}"></a>
+
+                                        {% endif %}
+                                    </tr>
+                                    {% endif %}
+                                {%endfor%}
+                            {% endif %}
+                        {% endfor %}
+                    {% endfor %}
+                </table>
+                <hr>
+<!--                <a href="{{url_for('users.register')}}"><button>Add other loan for users</button></a>-->
+            </div>
+    </div>
+<!--<script>-->
+<!--    $(function()-->
+<!--        {-->
+<!--            $('#demodelete').click(function()-->
+<!--            {-->
+<!--                var confirm = confirm("Are you sure?");-->
+<!--                if (confirm == true)-->
+<!--                    {-->
+<!--                    $.ajax({-->
+<!--                        url: '/delete_fd/{{user_id}}',-->
+<!--                        success: function(response)-->
+<!--                        {-->
+<!--                            console.log(response);-->
+<!--                        }});-->
+<!--                    }-->
+<!--            });-->
+<!--    });-->
+
+<!--</script>-->
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript">
+    $(function()
+
+        {
+            $('#demodelete').click(function()
+            {
+                console.log("yheh")
+                var confirm = confirm("Are you sure?");
+                if (confirm == true)
+                    {
+                    $.ajax({
+<!--                    console.log(user_id)-->
+                        url: '/delete_fd/user.user_id',
+<!--                        url: '/delete_fd/'+user_id,-->
+<!--                        url: {{url_for('admin.delete_fd',user_id=user_id)}}-->
+                        success: function(response)
+                        {
+                            console.log(response);
+                        }});
+                    }
+            });
+    });
+</script>
+{% endblock content %}

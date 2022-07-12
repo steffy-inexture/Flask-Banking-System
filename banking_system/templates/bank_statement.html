@@ -1,0 +1,75 @@
+<!doctype html>
+<html>
+    <head>
+    </head>
+
+    <body>
+
+<main role="main" class="container">
+    <pre style="background-color: black; color:aliceblue; text-align:left;">&nbsp;&nbsp;&nbsp;&nbsp;Bank statements :</pre>
+    </h4>
+    <h4>Name: {{current_user.user_name}}</h4>
+    <h4>Email: {{current_user.user_email}}</h4>
+    <h4>Account number: {{account.account_number}}</h4>
+    <table style="font-family: arial, sans-serif;
+            border-collapse: collapse;
+            width: 100%;">
+                <tr style="border: 1px solid #dddddd;
+                text-align: left;
+                padding: 8px;">
+                    <th style="border: 1px solid #dddddd;
+                    text-align: left;
+                    padding: 8px;">Transaction id</th>
+                    <th style="border: 1px solid #dddddd;
+                    text-align: left;
+                    padding: 8px;">Transaction date</th>
+                    <th style="border: 1px solid #dddddd;
+                    text-align: left;
+                    padding: 8px;">Transaction amount</th>
+                    <th style="border: 1px solid #dddddd;
+                    text-align: left;
+                    padding: 8px;">Sender id</th>
+                    <th style="border: 1px solid #dddddd;
+                    text-align: left;
+                    padding: 8px;">Reciever id</th>
+                    <th style="border: 1px solid #dddddd;
+                    text-align: left;
+                    padding: 8px;">Transaction type</th>
+                </tr>
+                {% for transaction in transactions %}
+                <tr style="border: 1px solid #dddddd;
+                text-align: left;
+                padding: 8px;">
+                    <td style="border: 1px solid #dddddd;
+                    text-align: left;
+                    padding: 8px;">{{transaction.transaction_id}}</td>
+                    <td style="border: 1px solid #dddddd;
+                    text-align: left;
+                    padding: 8px;">{{transaction.transaction_date}}</td>
+                    <td style="border: 1px solid #dddddd;
+                    text-align: left;
+                    padding: 8px;">{{transaction.transaction_amount}}</td>
+                    <td style="border: 1px solid #dddddd;
+                     text-align: left;
+                     padding: 8px;">{{transaction.sender_id}}</td>
+                    <td style="border: 1px solid #dddddd;
+                    text-align: left;
+                    padding: 8px;">{{transaction.receiver_id}}</td>
+                    {% for transaction_type in transaction_type %}
+                    {%if transaction_type.transaction_id==transaction.transaction_id %}
+                    <td style="border: 1px solid #dddddd;
+                    text-align: left;
+                    padding: 8px;">{{transaction_type.transaction_type}}</td>
+                    {%endif%}
+                    {% endfor %}
+                </tr>
+
+                {% endfor %}
+    <hr>
+
+</main>
+
+    </body>
+</html>
+
+

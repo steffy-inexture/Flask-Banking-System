@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block content %}
+	<div class="content-section">
+		<form method="POST" action="">
+			{{ form.hidden_tag() }}
+			{{form.user_email}}
+			<fieldset class="form-group">
+				<legend class="border-bottom mb-4">Check the OTP</legend>
+				<input type="hidden" value="{{form.user_id.data}}">
+				<div class="form-group">
+					{{ form.user_id.label(class="form-control-label")}}
+					{% if form.user_id.errors %}
+						{{ form.user_id(class="form-control form-control-lg is-invalid")}}
+						<div class="invalid-feedback">
+							{% for error in form.user_id.errors %}
+							<span>{{ error }}</span>
+							{% endfor %}
+						</div>
+					{% else %}
+						{{ form.user_id(class="form-control form-control-lg") }}
+					{% endif %}
+				</div>
+				<div class="form-group">
+					{{ form.transaction_amount.label(class="form-control-label")}}
+					{% if form.transaction_amount.errors %}
+						{{ form.transaction_amount(class="form-control form-control-lg is-invalid")}}
+						<div class="invalid-feedback">
+							{% for error in form.transaction_amount.errors %}
+							<span>{{ error }}</span>
+							{% endfor %}
+						</div>
+					{% else %}
+						{{ form.transaction_amount(class="form-control form-control-lg") }}
+					{% endif %}
+				</div>
+
+
+
+				<div class="form-group">
+					{{ form.sender_id.label(class="form-control-label")}}
+					{% if form.sender_id.errors %}
+						{{ form.sender_id(class="form-control form-control-lg is-invalid")}}
+						<div class="invalid-feedback">
+							{% for error in form.sender_id.errors %}
+							<span>{{ error }}</span>
+							{% endfor %}
+						</div>
+					{% else %}
+						{{ form.sender_id(class="form-control form-control-lg") }}
+					{% endif %}
+				</div>
+				<div class="form-group">
+					{{ form.receiver_id.label(class="form-control-label")}}
+					{% if form.receiver_id.errors %}
+						{{ form.receiver_id(class="form-control form-control-lg is-invalid")}}
+						<div class="invalid-feedback">
+							{% for error in form.receiver_id.errors %}
+							<span>{{ error }}</span>
+							{% endfor %}
+						</div>
+					{% else %}
+						{{ form.receiver_id(class="form-control form-control-lg") }}
+					{% endif %}
+				</div>
+
+
+				<div class="form-group">
+					{{ form.otp.label(class="form-control-label")}}
+					{% if form.otp.errors %}
+						{{ form.otp(class="form-control form-control-lg is-invalid")}}
+						<div class="invalid-feedback">
+							{% for error in form.otp.errors %}
+							<span>{{ error }}</span>
+							{% endfor %}
+						</div>
+					{% else %}
+						{{ form.otp(class="form-control form-control-lg") }}
+					{% endif %}
+				</div>
+
+			</fieldset>
+			<div class="form-group">
+				{{ form.submit(class="btn btn-outline-info") }}
+			</div>
+		</form>
+	</div>
+{% endblock content %}

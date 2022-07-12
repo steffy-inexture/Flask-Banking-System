@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block content %}
+<a href="{{url_for('admin.admin_dashboard')}}"><button>Go back</button></a>
+<br>
+<hr>
+<div class="row">
+          <br>
+            <br>
+            <div class="col-md-12" style="text-align:center;border:solid;padding:15px;">
+                <h5 style="text-align: center;background:black;color:white;">user's Loan Data</h5>
+                <table style="text-align:left">
+                    <tr>
+
+                        <th style="text-align:left"><pre>User id     </pre></th>&nbsp;
+                        <th style="text-align:left"><pre>User name  </pre></th>&nbsp;
+                        <th style="text-align:left"><pre>Loan id   </pre></th>
+                        <th style="text-align:left"><pre>Loan amount   </pre></th>
+                        <th style="text-align:left"><pre>Rate interest   </pre></th>
+                        <th style="text-align:left"><pre>Paid amount   </pre></th>
+                        <th style="text-align:left"><pre>Loan Type   </pre></th>
+                        <th style="text-align:left"><pre>Loan status   </pre></th>
+                        <th style="text-align:left"><pre>Loan approval   </pre></th>
+
+                    </tr>
+                    {% for user in user.items %}
+                    {% if user.user_email!='steffy.inexture@gmail.com' %}
+                    <tr>
+
+                        {% for loan in loans%}
+                        {% if loan.user_id==user.user_id %}
+                        {% for loantype in loantype %}
+                        {% if loantype.loan_id==loan.loan_id %}
+                        <td><pre>{{user.user_id}}   </pre></td>&nbsp;
+                        <td><pre>{{user.user_name}}  </pre></td>&nbsp;
+                        <td><pre>{{loan.loan_id}}  </pre></td>&nbsp;
+                        <td><pre>{{loan.loan_amount}}  </pre></td>&nbsp;
+                        <td><pre>{{loan.rate_interest}}  </pre></td>&nbsp;
+                        <td><pre>{{loan.paid_amount}}  </pre></td>&nbsp;
+                        <td><pre>{{loantype.loan_type}}  </pre></td>&nbsp;
+                        <td><pre><button>{{loan.loan_status}}  </pre></button></td>&nbsp;
+                        <td><pre><button><a href="{{url_for('admin.loan_approval',
+                                                    user_id=user.user_id,
+                                                    user_name=user.user_name,
+                                                    loan_id=loan.loan_id,
+                                                    loan_amount=loan.loan_amount,
+                                                    rate_interest=loan.rate_interest,
+                                                    paid_amount=loan.paid_amount,
+                                                    loan_type=loantype.loan_type,
+                                                    loan_status=loan.loan_status)}}">Aprroval status</a>  </pre></button></td>&nbsp;
+                        {% endif %}
+                        {% endfor %}
+
+                        {% endif %}
+                        {% endfor%}
+                    </tr>
+                    {%endif%}
+                    {% endfor %}
+                </table>
+
+                {% for page_num in user.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2)  %}
+                            {% if page_num %}
+                                {% if user.page == page_num %}
+                <a href="{{ url_for('admin.admin_user_loan_data', page=page_num)}}"><button>{{page_num}}</button></a>
+                                {% else %}
+
+                <a href="{{ url_for('admin.admin_user_loan_data', page=page_num)}}"><button>{{page_num}}</button></a>
+                                {% endif %}
+                            {% else %}
+                                ...
+                            {% endif %}
+
+                        {% endfor %}
+                <hr>
+                <a href="{{url_for('users.register')}}"><button>Add other loan for users</button></a>
+            </div>
+    </div>
+{% endblock content %}

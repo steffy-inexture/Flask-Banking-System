@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+{% block content %}
+	<div class="content-section">
+		<form method="POST" action="">
+			{{ form.hidden_tag() }}
+			<fieldset class="form-group">
+				<legend class="border-bottom mb-4">Insurance Approval</legend>
+				<div class="form-group">
+					{{ form.user_id.label(class="form-control-label")}}
+					{% if form.user_id.errors %}
+						{{ form.user_id(class="form-control form-control-lg is-invalid")}}
+						<div class="invalid-feedback">
+							{% for error in form.user_id.errors %}
+							<span>{{ error }}</span>
+							{% endfor %}
+						</div>
+					{% else %}
+						{{ form.user_id(class="form-control form-control-lg") }}
+					{% endif %}
+				</div>
+				<div class="form-group">
+					{{ form.user_name.label(class="form-control-label")}}
+					{% if form.user_name.errors %}
+						{{ form.user_name(class="form-control form-control-lg is-invalid")}}
+						<div class="invalid-feedback">
+							{% for error in form.user_name.errors %}
+							<span>{{ error }}</span>
+							{% endfor %}
+						</div>
+					{% else %}
+						{{ form.user_name(class="form-control form-control-lg") }}
+					{% endif %}
+				</div>
+
+				<div class="form-group">
+					{{ form.insurance_id.label(class="form-control-label")}}
+					{% if form.insurance_id.errors %}
+						{{ form.insurance_id(class="form-control form-control-lg is-invalid")}}
+						<div class="invalid-feedback">
+							{% for error in form.insurance_id.errors %}
+							<span>{{ error }}</span>
+							{% endfor %}
+						</div>
+					{% else %}
+						{{ form.insurance_id(class="form-control form-control-lg") }}
+					{% endif %}
+				</div>
+
+				<div class="form-group">
+					{{ form.insurance_amount.label(class="form-control-label")}}
+					{% if form.insurance_amount.errors %}
+						{{ form.insurance_amount(class="form-control form-control-lg is-invalid")}}
+						<div class="invalid-feedback">
+							{% for error in form.insurance_amount.errors %}
+							<span>{{ error }}</span>
+							{% endfor %}
+						</div>
+					{% else %}
+						{{ form.insurance_amount(class="form-control form-control-lg") }}
+					{% endif %}
+				</div>
+
+
+				<div class="form-group">
+					{{ form.insurance_type.label(class="form-control-label")}}
+					{% if form.insurance_type.errors %}
+						{{ form.insurance_type(class="form-control form-control-lg is-invalid")}}
+						<div class="invalid-feedback">
+							{% for error in form.insurance_type.errors %}
+							<span>{{ error }}</span>
+							{% endfor %}
+						</div>
+					{% else %}
+						{{ form.insurance_type(class="form-control form-control-lg") }}
+					{% endif %}
+				</div>
+
+				<div class="form-group">
+					{{ form.insurance_status.label(class="form-control-label")}}
+					{% if form.insurance_status.errors %}
+						{{ form.insurance_status(class="form-control form-control-lg is-invalid")}}
+						<div class="invalid-feedback">
+							{% for error in form.insurance_status.errors %}
+							<span>{{ error }}</span>
+							{% endfor %}
+						</div>
+					{% else %}
+						{{ form.insurance_status(class="form-control form-control-lg") }}
+					{% endif %}
+				</div>
+				<div class="form-group">
+					{{ form.approval_status.label(class="form-control-label")}}
+					{% if form.approval_status.errors %}
+						{{ form.approval_status(class="form-control form-control-lg is-invalid")}}
+						<div class="invalid-feedback">
+							{% for error in form.approval_status.errors %}
+							<span>{{ error }}</span>
+							{% endfor %}
+						</div>
+					{% else %}
+						{{ form.approval_status(class="form-control form-control-lg") }}
+					{% endif %}
+				</div>
+
+
+
+			</fieldset>
+			<div class="form-group">
+				{{ form.submit(class="btn btn-outline-info") }}
+			</div>
+		</form>
+	</div>
+{% endblock content %}

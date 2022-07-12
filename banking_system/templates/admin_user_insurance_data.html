@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block content %}
+<a href="{{url_for('admin.admin_dashboard')}}"><button>Go back</button></a>
+<br>
+<hr>
+<div class="row">
+          <br>
+            <br>
+            <div class="col-md-12" style="text-align:center;border:solid;padding:15px;">
+                <h5 style="text-align: center;background:black;color:white;">user's Insurance Data</h5>
+                <table style="text-align:left">
+                    <tr>
+
+                        <th style="text-align:left"><pre>User id     </pre></th>&nbsp;
+                        <th style="text-align:left"><pre>User name  </pre></th>&nbsp;
+                        <th style="text-align:left"><pre>Insurance id   </pre></th>
+                        <th style="text-align:left"><pre>Insurance amount   </pre></th>
+                        <th style="text-align:left"><pre>Insurance Type   </pre></th>
+                        <th style="text-align:left"><pre>Insurance status   </pre></th>
+                        <th style="text-align:left"><pre>Insurance approval   </pre></th>
+
+                    </tr>
+                    {% for user in users %}
+                    {% if user.user_email!='steffy.inexture@gmail.com' %}
+                    <tr>
+
+                        {% for insurance in insurances%}
+                        {% if insurance.user_id==user.user_id %}
+                        {% for insurancetype in insurancetypes %}
+                        {% if insurancetype.insurance_id==insurance.insurance_id %}
+                        <td><pre>{{user.user_id}}   </pre></td>&nbsp;
+                        <td><pre>{{user.user_name}}  </pre></td>&nbsp;
+                        <td><pre>{{insurance.insurance_id }}  </pre></td>&nbsp;
+                        <td><pre>{{insurance.insurance_amount}}  </pre></td>&nbsp;
+                        <td><pre>{{insurancetype.insurance_type}}  </pre></td>&nbsp;
+                        <td><pre><button>{{insurance.insurance_status}}  </pre></button></td>&nbsp;
+                        <td><pre><button><a href="{{url_for('admin.insurance_approval',
+                                                    user_id=user.user_id,
+                                                    user_name=user.user_name,
+                                                    insurance_id=insurance.insurance_id,
+                                                    insurance_amount=insurance.insurance_amount,
+                                                    insurance_type=insurancetype.insurance_type,
+                                                    insurance_status=insurance.insurance_status)}}">Aprroval status</a>  </pre></button></td>&nbsp;
+                        {% endif %}
+                        {% endfor %}
+
+                        {% endif %}
+                        {% endfor%}
+                    </tr>
+                    {%endif%}
+                    {% endfor %}
+                </table>
+                <hr>
+                <a href="{{url_for('users.register')}}"><button>Add other insurance for users</button></a>
+            </div>
+    </div>
+{% endblock content %}

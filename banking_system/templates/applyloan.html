@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block content %}
+	<div class="content-section">
+		<form method="POST" action="">
+			{{ form.hidden_tag() }}
+			<fieldset class="form-group">
+				<legend class="border-bottom mb-4">Account status change</legend>
+				<div class="form-group">
+					{{ form.user_id.label(class="form-control-label")}}
+					{% if form.user_id.errors %}
+						{{ form.user_id(class="form-control form-control-lg is-invalid")}}
+						<div class="invalid-feedback">
+							{% for error in form.user_id.errors %}
+							<span>{{ error }}</span>
+							{% endfor %}
+						</div>
+					{% else %}
+						{{ form.user_id(class="form-control form-control-lg") }}
+					{% endif %}
+				</div>
+				<div class="form-group">
+					{{ form.user_name.label(class="form-control-label")}}
+					{% if form.user_name.errors %}
+						{{ form.user_name(class="form-control form-control-lg is-invalid")}}
+						<div class="invalid-feedback">
+							{% for error in form.user_name.errors %}
+							<span>{{ error }}</span>
+							{% endfor %}
+						</div>
+					{% else %}
+						{{ form.user_name(class="form-control form-control-lg") }}
+					{% endif %}
+				</div>
+
+
+
+				<div class="form-group">
+					{{ form.loan_amount_choices.label(class="form-control-label")}}
+					{% if form.loan_amount_choices.errors %}
+						{{ form.loan_amount_choices(class="form-control form-control-lg is-invalid")}}
+						<div class="invalid-feedback">
+							{% for error in form.loan_amount_choices.errors %}
+							<span>{{ error }}</span>
+							{% endfor %}
+						</div>
+					{% else %}
+						{{ form.loan_amount_choices(class="form-control form-control-lg") }}
+					{% endif %}
+				</div>
+
+
+				<div class="form-group">
+					{{ form.loan_rate_interests.label(class="form-control-label")}}
+					{% if form.loan_rate_interests.errors %}
+						{{ form.loan_rate_interests(class="form-control form-control-lg is-invalid")}}
+						<div class="invalid-feedback">
+							{% for error in form.loan_rate_interests.errors %}
+							<span>{{ error }}</span>
+							{% endfor %}
+						</div>
+					{% else %}
+						{{ form.loan_rate_interests(class="form-control form-control-lg") }}
+					{% endif %}
+				</div>
+
+				<div class="form-group">
+					{{ form.loan_type.label(class="form-control-label")}}
+					{% if form.loan_type.errors %}
+						{{ form.loan_type(class="form-control form-control-lg is-invalid")}}
+						<div class="invalid-feedback">
+							{% for error in form.loan_rate_interests.errors %}
+							<span>{{ error }}</span>
+							{% endfor %}
+						</div>
+					{% else %}
+						{{ form.loan_type(class="form-control form-control-lg") }}
+					{% endif %}
+				</div>
+
+			</fieldset>
+			<div class="form-group">
+				{{ form.submit(class="btn btn-outline-info") }}
+			</div>
+		</form>
+	</div>
+{% endblock content %}

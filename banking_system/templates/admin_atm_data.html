@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block content %}
+<a href="{{url_for('admin.admin_dashboard')}}">
+    <button>Go back</button>
+</a>
+<br>
+<hr>
+<div class="col-md-4" style="text-align:center;border:solid;padding:15px;">
+    <h5 style="text-align: center;;background:black;color:white;">bank atm's Data</h5>
+    <table style="text-align:left">
+        <tr>
+            <th style="text-align:left">
+                <pre>id     </pre>
+            </th>&nbsp;
+            <th style="text-align:left">
+                <pre>atm address   </pre>
+            </th>&nbsp;
+        </tr>
+        {% for atm in atms.items %}
+        <tr>
+            <td>
+                <pre>{{atm.atm_id}}   </pre>
+            </td>&nbsp;
+            <td>
+                <pre>{{atm.atm_address}}   </pre>
+            </td>&nbsp;
+        </tr>
+        {% endfor %}
+    </table>
+    {% for page_num in atms.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+    {% if page_num %}
+    {% if atms.page == page_num %}
+    <a href="{{ url_for('admin.admin_atm_data', page=page_num)}}">
+        <button>{{page_num}}</button>
+    </a>
+    {% else %}
+
+    <a href="{{ url_for('admin.admin_atm_data', page=page_num)}}">
+        <button>{{page_num}}</button>
+    </a>
+    {% endif %}
+    {% else %}
+    ...
+    {% endif %}
+    {% endfor %}
+    <hr>
+    <a href="{{url_for('admin.add_atm')}}" style="text-align:left">
+        <button>Add new Bank atm</button>
+    </a>
+</div>
+{% endblock content %}

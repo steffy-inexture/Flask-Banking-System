@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block content %}
+
+<ul class="list-group">
+	<li class="list-group-item"><img src="{{url_for('static', filename='pics/sjk_logo.jpg')}}" alt="fttgh"">
+		&nbsp;&nbsp;&nbsp;Hey! Welcome to the SJK banking system
+	</li>
+</ul>
+
+<br>
+<br>
+<ul class="list-group">
+	<li class="list-group-item"><img src="{{url_for('static', filename='pics/money.png')}}" alt="fttgh" height="200px" width="400px">
+		&nbsp;&nbsp;&nbsp;Your money will be safe with us &nbsp;&nbsp;&nbsp;<button type="button"><a href="{{ url_for('about.money') }}">About money</a></button> <br>
+	</li>
+</ul>
+<br>
+<br>
+<ul class="list-group">
+	<li class="list-group-item"><img src="{{url_for('static', filename='pics/fd.png')}}" alt="fttgh" height="200px" width="400px">
+		&nbsp;&nbsp;&nbsp;Fixed deposites will be the safer option.&nbsp;&nbsp;&nbsp;<button type="button"><a href="{{ url_for('about.fd') }}">About fixed deposits</a></button> <br>
+	</li>
+</ul>
+<br>
+<br>
+<ul class="list-group">
+	<li class="list-group-item"><img src="{{url_for('static', filename='pics/loan.png')}}" alt="fttgh" height="200px" width="400px">
+		&nbsp;&nbsp;&nbsp;No money?? no worries we are here for you! take loans :)&nbsp;&nbsp;&nbsp;<button type="button"><a href="{{ url_for('about.loan') }}">About loans</a></button> <br>
+	</li>
+</ul>
+<br>
+<br>
+<ul class="list-group">
+	<li class="list-group-item"><img src="{{url_for('static', filename='pics/insurance.png')}}" alt="fttgh" height="200px" width="400px">
+		&nbsp;&nbsp;&nbsp;Your life is precious..take step towards insurance for better way!!&nbsp;&nbsp;&nbsp;<button type="button"><a href="{{ url_for('about.insurance') }}">About insurance</a></button> <br>
+	</li>
+</ul>
+
+{% endblock content %}

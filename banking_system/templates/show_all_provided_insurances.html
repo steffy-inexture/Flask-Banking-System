@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+<a href="{{url_for('admin.admin_dashboard')}}"><button>Go back</button></a>
+<br>
+<hr>
+<div class="col-md-4" style="text-align:center;border:solid;padding:15px;">
+                <h5 style="text-align: center;;background:black;color:white;">Bank provided Insurance Data</h5>
+                <table style="text-align:left">
+                    <tr >
+                    <th style="text-align:left"><pre>id     </pre></th>&nbsp;
+                    <th style="text-align:left"><pre>member role name   </pre></th>&nbsp;
+                    </tr>
+                    {% for insurance in insurances.items %}
+                    <tr>
+                        <td><pre>{{insurance.id}}   </pre></td>&nbsp;
+                        <td><pre>{{insurance.insurance_name}}   </pre></td>&nbsp;
+                    </tr>
+                    {% endfor %}
+                </table>
+                {% for page_num in insurances.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2)  %}
+                            {% if page_num %}
+                                {% if insurances.page == page_num %}
+                <a href="{{ url_for('admin.show_insurance_choices', page=page_num)}}"><button>{{page_num}}</button></a>
+                                {% else %}
+
+                <a href="{{ url_for('admin.show_insurance_choices', page=page_num)}}"><button>{{page_num}}</button></a>
+                                {% endif %}
+                            {% else %}
+                                ...
+                            {% endif %}
+                        {% endfor %}
+                <hr>
+                <a href="{{url_for('admin.insurance_choices')}}" style="text-align:left"><button>Add new Bank insurance data</button></a>
+            </div>
+{% endblock content %}

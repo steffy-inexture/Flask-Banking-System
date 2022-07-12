@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="content-section">
+    <form method="POST" action="" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+        <fieldset class="form-group">
+            <legend class="border-bottom mb-4">Add Bank Member</legend>
+            <div class="form-group">
+                {{ form.image_file.label(class="form-control-label")}}
+                {% if form.image_file.errors %}
+                {{ form.image_file(class="form-control form-control-lg is-invalid")}}
+                <div class="invalid-feedback">
+                    {% for error in form.image_file.errors %}
+                    <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% else %}
+                {{ form.image_file(class="form-control form-control-lg") }}
+                {% endif %}
+            </div>
+            <div class="form-group">
+                {{ form.bank_member_name.label(class="form-control-label")}}
+                {% if form.bank_member_name.errors %}
+                {{ form.bank_member_name(class="form-control form-control-lg is-invalid")}}
+                <div class="invalid-feedback">
+                    {% for error in form.bank_member_name.errors %}
+                    <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% else %}
+                {{ form.bank_member_name(class="form-control form-control-lg") }}
+                {% endif %}
+            </div>
+            <div class="form-group">
+                {{ form.bank_member_position.label(class="form-control-label")}}
+                {% if form.bank_member_position.errors %}
+                {{ form.bank_member_position(class="form-control form-control-lg is-invalid")}}
+                <div class="invalid-feedback">
+                    {% for error in form.bank_member_position.errors %}
+                    <span>{{ error }}</span>
+                    {% endfor %}
+
+                </div>
+                {% else %}
+                {{ form.bank_member_position(class="form-control form-control-lg") }}
+                {% endif %}
+            </div>
+            <div class="form-group">
+                {{ form.bank_member_about.label(class="form-control-label")}}
+                {% if form.bank_member_about.errors %}
+                {{ form.bank_member_about(class="form-control form-control-lg is-invalid")}}
+                <div class="invalid-feedback">
+                    {% for error in form.bank_member_about.errors %}
+                    <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% else %}
+                {{ form.bank_member_about(class="form-control form-control-lg") }}
+                {% endif %}
+            </div>
+            <div class="form-group">
+                {{ form.bank_member_email_id.label(class="form-control-label")}}
+                {% if form.bank_member_email_id.errors %}
+                {{ form.bank_member_email_id(class="form-control form-control-lg is-invalid")}}
+                <div class="invalid-feedback">
+                    {% for error in form.bank_member_email_id.errors %}
+                    <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% else %}
+                {{ form.bank_member_email_id(class="form-control form-control-lg") }}
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                {{ form.bank_member_contact.label(class="form-control-label")}}
+                {% if form.bank_member_contact.errors %}
+                {{ form.bank_member_contact(class="form-control form-control-lg is-invalid")}}
+                <div class="invalid-feedback">
+                    {% for error in form.bank_member_contact.errors %}
+                    <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% else %}
+                {{ form.bank_member_contact(class="form-control form-control-lg") }}
+                {% endif %}
+            </div>
+        </fieldset>
+        <div class="form-group">
+            {{ form.submit(class="btn btn-outline-info") }}
+        </div>
+    </form>
+    <div class="border-top pt-3">
+        <small class="text-muted">
+            Need an account?? <a class="ml-2" href="{{ url_for('users.register') }}">Sign Up now</a>
+        </small>
+    </div>
+</div>
+{% endblock content %}

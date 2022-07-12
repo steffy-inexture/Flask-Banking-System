@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="about-section" style=" padding: 50px;
+text-align: center;
+background-color: rgb(25, 25, 53);
+color: white;">
+    <div class="row">
+        <div class="col-md-4">
+            <img src="{{url_for('static', filename='pics/sjk_logo.jpg')}}" alt="fttgh">
+        </div>
+        <div class=" col-md-8">
+            <h1 style=" color:white ;">About Us Page</h1>
+            <hr style="background-color: white;">
+            <p>Hey this is SJK BANK!!!.</p>
+            <p> Just do it....lets live fully...</p>
+        </div>
+    </div>
+</div>
+<br>
+<h2 style="text-align:center">Our Team</h2>
+<div class="row">
+    {% for member in bank_member %}
+    <div class="column" style=" float: left;width: 33.3%;margin-bottom: 16px;padding: 0 8px;">
+        <div class="card" style="box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);margin: 8px;">
+            <img src="{{url_for('static', filename='pics/'+member.image_file)}}" alt="Picture"
+                 style="width:100%; height: 250px;">
+            <hr style="background-color:rgb(25, 25, 53);">
+            <div class="container" style="padding: 0 16px;">
+                <h2>{{member.bank_member_name}}</h2>
+                {{member.bank_member_position}}
+                <p class="title" style="color: grey;">{{member.bank_member_position}}</p>
+                <p>{{member.bank_member_about}}</p>
+                <p>{{member.bank_member_email_id}}</p>
+                <p>
+                    <button class="button" style="border: none;
+					outline: 0;
+					display: inline-block;
+					padding: 8px;
+					color: white;
+					background-color: rgb(25, 25, 53);
+					text-align: center;
+					cursor: pointer;
+					width: 100%;">Contact: {{member.bank_member_contact}}
+                    </button>
+                </p>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock content %}
