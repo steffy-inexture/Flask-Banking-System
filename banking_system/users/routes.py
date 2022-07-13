@@ -1,3 +1,5 @@
+import platform
+
 import pdfkit
 from flask import render_template, url_for, flash, redirect, request, Blueprint, session, make_response
 from flask_login import login_user, current_user, logout_user, login_required
@@ -630,7 +632,11 @@ def bank_statement_pdf():
         transactions=transactions,
         transaction_type=transaction_type
     )
-    pdf = pdfkit.from_string(render, False)
+    if platform.system() == 'Linux':
+        config = None
+    else:
+        config = pdfkit.configuration(wkhtmltopdf='./bin/wkhtmltopdf')
+    pdf = pdfkit.from_string(render, False, configuration=config)
     response = make_response(pdf)
     response.headers["Content-Type"] = "application/pdf"
     response.headers["Content-Disposition"] = "attachment;filename=bank_statement.pdf"
