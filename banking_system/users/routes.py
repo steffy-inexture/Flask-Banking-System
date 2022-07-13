@@ -512,7 +512,6 @@ def otp_check():
     form = OtpCheck()
     print("form checked")
     if form.validate_on_submit():
-        print("")
         user_id = form.user_id.data
         transaction_amount = form.transaction_amount.data
         sender_id = form.sender_id.data
