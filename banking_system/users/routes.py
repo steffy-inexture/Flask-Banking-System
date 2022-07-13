@@ -633,7 +633,6 @@ def bank_statement_pdf():
         transactions=transactions,
         transaction_type=transaction_type
     )
-
     WKHTMLTOPDF_CMD = subprocess.Popen(['which', './bin/wkhtmltopdf'], stdout=subprocess.PIPE).communicate()[0].strip()
     print(f"CONFIG {WKHTMLTOPDF_CMD}")
     pdfkit_config = pdfkit.configuration(wkhtmltopdf=WKHTMLTOPDF_CMD)
