@@ -37,7 +37,6 @@ def register():
         user = User(user_name=user_name, user_password=user_password, user_email=user_email,
                     user_phone_number=user_phone_number, user_first_name=user_first_name, user_last_name=user_last_name,
                     user_address=user_address, user_age=user_age, date_of_birth=date_of_birth)
-
         db.session.add(user)
         try:
             db.session.commit()
@@ -50,12 +49,9 @@ def register():
             if current_user.user_email == 'steffy.inexture@gmail.com':
                 flash(NEW_USER_ADDED, FLASH_MESSAGES['SUCCESS'])
                 return redirect(url_for('admin.admin_dashboard'))
-
         flash(SUCCESSFUL_REGISTRATION, FLASH_MESSAGES['SUCCESS'])
         return redirect(url_for('users.login'))
-
     return render_template('register.html', title='Register', form=form)
-
 
 # create the bank account at the initial stage
 @users.route("/account-creation", methods=['GET', 'POST'])
@@ -79,9 +75,7 @@ def change_branch():
     user = User.query.filter_by(user_id=current_user.user_id).first()
     account = Account.query.filter_by(user_id=current_user.user_id).first()
     branches = Branch.query.all()
-
     form = ChangeBranch()
-
     if form.validate_on_submit():
         print("this is branch selected by the user: ", form.myField.data)
         selected_branch = form.myField.data
@@ -92,14 +86,12 @@ def change_branch():
             flash(BRANCH_CHANGED, FLASH_MESSAGES['SUCCESS'])
         else:
             flash(ERROR, FLASH_MESSAGES['FAIL'])
-
         return redirect(url_for('users.dashboard'))
     elif request.method == 'GET':
         form.user_id.data = user.user_id
         form.user_name.data = user.user_name
         form.account_number.data = account.account_number
         form.myField.choices = [i.branch_name for i in Branch.query.all()]
-
     return render_template('change_branch.html', user=user, account=account, branches=branches, form=form)
 
 
@@ -118,12 +110,10 @@ def login():
                 if user is not None and form.user_password.data == user.user_password:
                     login_user(user, remember=form.remember.data)
                     flash(SUCCESSFUL_LOGIN, FLASH_MESSAGES['SUCCESS'])
-
                     return redirect(url_for('users.dashboard'))
                 else:
                     flash(UNSUCCESSFUL_LOGIN, FLASH_MESSAGES['FAIL'])
     return render_template('login.html', title='login', form=form)
-
 
 # User dashboard to show all the functionalities which is performed by the user only
 @users.route("/user-dashboard", methods=['GET', 'POST'])
@@ -168,7 +158,6 @@ def logout():
 def profile():
     form = UpdateAccountForm()
     if form.validate_on_submit():
-
         current_user.user_name = form.user_name.data
         current_user.user_phone_number = form.user_phone_number.data
         current_user.user_first_name = form.user_first_name.data
@@ -176,7 +165,6 @@ def profile():
         current_user.user_address = form.user_address.data
         current_user.user_age = form.user_age.data
         current_user.date_of_birth = form.date_of_birth.data
-
         db.session.commit()
         flash(ACCOUNT_UPDATED, FLASH_MESSAGES['SUCCESS'])
         return redirect(url_for('users.dashboard'))
@@ -242,7 +230,6 @@ def request_account():
                 account_number = account[0] + 1
             else:
                 account_number = 1000000
-
             account = Account(account_number=account_number, user_id=user.user_id, branch_id=branch_id)
             db.session.add(account)
             db.session.commit()
