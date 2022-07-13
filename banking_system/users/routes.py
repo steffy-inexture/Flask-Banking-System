@@ -637,6 +637,7 @@ def bank_statement_pdf():
         config = pdfkit.configuration(wkhtmltopdf='./bin/wkhtmltopdf')
     else:
         config = None
+    print(f"CONFIG {config}")
     pdf = pdfkit.from_string(render, False, configuration=config)
     response = make_response(pdf)
     response.headers["Content-Type"] = "application/pdf"
