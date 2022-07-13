@@ -1,4 +1,4 @@
-import platform
+from os.path import exists
 
 import pdfkit
 from flask import render_template, url_for, flash, redirect, request, Blueprint, session, make_response
@@ -632,10 +632,11 @@ def bank_statement_pdf():
         transactions=transactions,
         transaction_type=transaction_type
     )
-    if platform.system() == 'Linux':
-        config = None
-    else:
+
+    if exists('./bin/wkhtmltopdf'):
         config = pdfkit.configuration(wkhtmltopdf='./bin/wkhtmltopdf')
+    else:
+        config = None
     pdf = pdfkit.from_string(render, False, configuration=config)
     response = make_response(pdf)
     response.headers["Content-Type"] = "application/pdf"
