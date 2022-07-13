@@ -22,7 +22,7 @@ from banking_system.users.constants import FLASH_MESSAGES, NEW_USER_ADDED, SUCCE
 users = Blueprint('users', __name__)
 
 
-@users.route("user/registration", methods=['GET', 'POST'])
+@users.route("/user/registration", methods=['GET', 'POST'])
 def register():
     """
         For register user
@@ -70,7 +70,7 @@ def register():
 
 
 # create the bank account at the initial stage
-@users.route("user/registration/account-creation", methods=['GET', 'POST'])
+@users.route("/user/registration/account-creation", methods=['GET', 'POST'])
 def account_creation(user_id):
     """
         Account creation for user
@@ -97,7 +97,7 @@ def account_creation(user_id):
 
 
 # for change the account selected default first branch
-@users.route("user/change_branch", methods=['GET', 'POST'])
+@users.route("/user/change_branch", methods=['GET', 'POST'])
 @login_required
 def change_branch():
     user = User.query.filter_by(user_id=current_user.user_id).first()
@@ -173,7 +173,7 @@ def dashboard():
 
 
 # logout route to log out the session after login and all procedure
-@users.route("user/logout")
+@users.route("/user/logout")
 @login_required
 def logout():
     logout_user()
@@ -271,7 +271,7 @@ def request_account():
 
 
 # Request for the card if not have carded yet
-@users.route("user/request-card", methods=['GET', 'POST'])
+@users.route("/user/request-card", methods=['GET', 'POST'])
 @login_required
 def request_card():
     if current_user.is_authenticated:
@@ -308,7 +308,7 @@ def request_card():
 
 # apply for loan via this route [ request goes to admin panel with INACTIVE STATUS]
 # giving the PERSONAL/EDUCATION/HOME/OTHER loan option right now
-@users.route("user/apply-for-loan", methods=['GET', 'POST'])
+@users.route("/user/apply-for-loan", methods=['GET', 'POST'])
 @login_required
 def apply_loan():
     form = ApplyLoanForm()
@@ -359,7 +359,7 @@ def apply_loan():
 
 
 # Request for insurance requested to admin panel with INACTIVE STATUS
-@users.route("user/request-insurance", methods=['GET', 'POST'])
+@users.route("/user/request-insurance", methods=['GET', 'POST'])
 @login_required
 def request_insurance():
     form = ApplyInsuranceForm()
@@ -404,7 +404,7 @@ def request_insurance():
 
 
 # add fixed deposit
-@users.route("user/add_fixed_deposit", methods=['GET', 'POST'])
+@users.route("/user/add_fixed_deposit", methods=['GET', 'POST'])
 @login_required
 def add_fixed_deposit():
     if current_user.is_authenticated:
@@ -420,7 +420,7 @@ def add_fixed_deposit():
 
 
 # add_money
-@users.route("user/add-money-to-other", methods=['GET', 'POST'])
+@users.route("/user/add-money-to-other", methods=['GET', 'POST'])
 @login_required
 def add_money():
     form = AddMoney()
@@ -465,7 +465,7 @@ def add_money():
 
 
 # transfer money
-@users.route("user/transfer-money", methods=['GET', 'POST'])
+@users.route("/user/transfer-money", methods=['GET', 'POST'])
 @login_required
 def transfer_money():
     user = User.query.filter_by(user_id=current_user.user_id).first()
@@ -533,7 +533,7 @@ def transfer_money():
     return render_template('transfermoney.html', form=form)
 
 
-@users.route("user/otp-check", methods=['GET', 'POST'])
+@users.route("/user/otp-check", methods=['GET', 'POST'])
 @login_required
 def otp_check():
     form = OtpCheck()
@@ -581,8 +581,6 @@ def otp_check():
 
     return render_template('otp_check.html', form=form)
 
-    pass
-
 
 count = 0
 
@@ -617,7 +615,7 @@ def fd_interest_money():
     return redirect(url_for('users.dashboard'))
 
 
-@users.route("user/bank-statement/", methods=['GET', 'POST'])
+@users.route("/user/bank-statement/", methods=['GET', 'POST'])
 @login_required
 def bank_statement():
     user = User.query.filter_by(user_name=current_user.user_name).first()
@@ -633,7 +631,7 @@ def bank_statement():
     )
 
 
-@users.route("user/bank-statement-pdf/", methods=['GET', 'POST'])
+@users.route("/user/bank-statement-pdf/", methods=['GET', 'POST'])
 @login_required
 def bank_statement_pdf():
     user = User.query.filter_by(user_name=current_user.user_name).first()
