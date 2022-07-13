@@ -1,6 +1,4 @@
 import subprocess
-from os.path import exists
-
 import pdfkit
 from flask import render_template, url_for, flash, redirect, request, Blueprint, session, make_response
 from flask_login import login_user, current_user, logout_user, login_required
@@ -18,14 +16,28 @@ from banking_system.users.constants import FLASH_MESSAGES, NEW_USER_ADDED, SUCCE
     ADMIN_NOT_ACTIVATE_UR_ACCOUNT, SUCCESSFUL_LOGIN, UNSUCCESSFUL_LOGIN, LOGOUT_SUCCESS, ACCOUNT_UPDATED, EMAIL_INFO, \
     INVALID_TOKEN, PASSWORD_UPDATED, ACCOUNT_ALREADY_EXISTED, ACCOUNT_CREATED, LOGIN_FIRST, ALREADY_CARD_EXISTED, \
     CARD_CREATED, TRANSACTION_SUCCESSFULLY, CANT_TRANSFER, \
-    PASSWORD_INCORRECT, INSUFFICIENT_BALANCE, PENDING_ACTIVITY, SUCCESS_ACTIVITY, BRANCH_CHANGED, ERROR
+    PASSWORD_INCORRECT, INSUFFICIENT_BALANCE, PENDING_ACTIVITY, SUCCESS_ACTIVITY, BRANCH_CHANGED, ERROR, \
+    SOMETHING_WENT_WRONG, SUCCESSFUL_TRANSACTION, WRONG_OTP, ALREADY_DONE, FD_ADDED
 
 users = Blueprint('users', __name__)
 
 
-# registration route to register user
-@users.route("/register", methods=['GET', 'POST'])
+@users.route("user/registration", methods=['GET', 'POST'])
 def register():
+    """
+        For register user
+        it will register the user (data will be stored in 'User' table)
+        with registration account for user also created automatically.
+        params: user : <object of table class 'User'>
+                account_creation: takes user id and create the bank account <user route>
+                role_assign: assigns the type of user in 'UserType' table <user route>
+        form: RegistrationForm --> for taking data from user
+        template:register.html
+        Methods: GET & POST
+        Redirects to:
+            after successful registration : 'users.login' [ aka login page ]
+            after unsuccessful registration : 'users.register' [ aka registration page ]
+    """
     form = RegistrationForm()
     if form.validate_on_submit():
         user_name = form.user_name.data,
@@ -56,9 +68,21 @@ def register():
         return redirect(url_for('users.login'))
     return render_template('register.html', title='Register', form=form)
 
+
 # create the bank account at the initial stage
-@users.route("/account-creation", methods=['GET', 'POST'])
+@users.route("user/registration/account-creation", methods=['GET', 'POST'])
 def account_creation(user_id):
+    """
+        Account creation for user
+        it will Create bank account for the user (data will be stored in 'Account' table)
+        params:
+            user_id: user id from 'User' table
+            user: <object of table class 'User'>
+            branch: first bank branch name
+            account: takes the account number which has been created by bank at last
+        returns to:
+            after creating bank account: 'user.register' route
+    """
     user = User.query.filter_by(user_id=user_id).first()
     branch = Branch.query.first()
     branch_id = branch.branch_id
@@ -71,8 +95,9 @@ def account_creation(user_id):
     db.session.add(account)
     db.session.commit()
 
+
 # for change the account selected default first branch
-@users.route("/change_branch", methods=['GET', 'POST'])
+@users.route("user/change_branch", methods=['GET', 'POST'])
 @login_required
 def change_branch():
     user = User.query.filter_by(user_id=current_user.user_id).first()
@@ -118,6 +143,7 @@ def login():
                     flash(UNSUCCESSFUL_LOGIN, FLASH_MESSAGES['FAIL'])
     return render_template('login.html', title='login', form=form)
 
+
 # User dashboard to show all the functionalities which is performed by the user only
 @users.route("/user-dashboard", methods=['GET', 'POST'])
 @login_required
@@ -147,7 +173,7 @@ def dashboard():
 
 
 # logout route to log out the session after login and all procedure
-@users.route("/logout")
+@users.route("user/logout")
 @login_required
 def logout():
     logout_user()
@@ -182,6 +208,7 @@ def profile():
         form.user_email.data = current_user.user_email
 
     return render_template('user_profile.html', title='Account', form=form)
+
 
 # reset password request for the ser
 @users.route("/reset_password", methods=['GET', 'POST'])
@@ -244,7 +271,7 @@ def request_account():
 
 
 # Request for the card if not have carded yet
-@users.route("/request-card", methods=['GET', 'POST'])
+@users.route("user/request-card", methods=['GET', 'POST'])
 @login_required
 def request_card():
     if current_user.is_authenticated:
@@ -281,7 +308,7 @@ def request_card():
 
 # apply for loan via this route [ request goes to admin panel with INACTIVE STATUS]
 # giving the PERSONAL/EDUCATION/HOME/OTHER loan option right now
-@users.route("/apply-for-loan", methods=['GET', 'POST'])
+@users.route("user/apply-for-loan", methods=['GET', 'POST'])
 @login_required
 def apply_loan():
     form = ApplyLoanForm()
@@ -332,7 +359,7 @@ def apply_loan():
 
 
 # Request for insurance requested to admin panel with INACTIVE STATUS
-@users.route("/request-insurance", methods=['GET', 'POST'])
+@users.route("user/request-insurance", methods=['GET', 'POST'])
 @login_required
 def request_insurance():
     form = ApplyInsuranceForm()
@@ -377,7 +404,7 @@ def request_insurance():
 
 
 # add fixed deposit
-@users.route("/add_fixed_deposit", methods=['GET', 'POST'])
+@users.route("user/add_fixed_deposit", methods=['GET', 'POST'])
 @login_required
 def add_fixed_deposit():
     if current_user.is_authenticated:
@@ -393,7 +420,7 @@ def add_fixed_deposit():
 
 
 # add_money
-@users.route("/add-money", methods=['GET', 'POST'])
+@users.route("user/add-money-to-other", methods=['GET', 'POST'])
 @login_required
 def add_money():
     form = AddMoney()
@@ -438,7 +465,7 @@ def add_money():
 
 
 # transfer money
-@users.route("/Transfer-money", methods=['GET', 'POST'])
+@users.route("user/transfer-money", methods=['GET', 'POST'])
 @login_required
 def transfer_money():
     user = User.query.filter_by(user_id=current_user.user_id).first()
@@ -502,11 +529,11 @@ def transfer_money():
         form.user_name.data = user.user_name
 
     else:
-        flash("something went wrong", 'danger')
+        flash(SOMETHING_WENT_WRONG, FLASH_MESSAGES['FAIL'])
     return render_template('transfermoney.html', form=form)
 
 
-@users.route("/otp-check", methods=['GET', 'POST'])
+@users.route("user/otp-check", methods=['GET', 'POST'])
 @login_required
 def otp_check():
     form = OtpCheck()
@@ -535,10 +562,10 @@ def otp_check():
                 transaction_id=transfer.transaction_id,
                 transaction_type=transaction_type)
 
-            flash('Transaction Successfully', 'success')
+            flash(SUCCESSFUL_TRANSACTION, FLASH_MESSAGES['SUCCESS'])
             return redirect(url_for('users.dashboard'))
         else:
-            flash('Transaction Unsuccessfully as otp is wrong', 'danger')
+            flash(WRONG_OTP, FLASH_MESSAGES['FAIL'])
             return redirect(url_for('users.dashboard'))
 
     elif request.method == 'GET':
@@ -550,7 +577,7 @@ def otp_check():
         print(form.user_id.data)
 
     else:
-        flash("something is wrong", 'danger')
+        flash(SOMETHING_WENT_WRONG, FLASH_MESSAGES['FAIL'])
 
     return render_template('otp_check.html', form=form)
 
@@ -571,38 +598,26 @@ def fd_interest_money():
     if old_date.date() < now.date():
         count += 1
         if count == 1:
-            print("fd_amount= ", fd.fd_amount)
-            print("fd_rate_interest=", fd.rate_interest)
             amount = (fd.fd_amount * fd.rate_interest) / 100
             account.account_balance += ((fd.fd_amount * fd.rate_interest) / 100)
             db.session.commit()
-            flash(f"{amount} has been added", 'success')
+            flash(FD_ADDED.format(amount=amount), FLASH_MESSAGES['SUCCESS'])
         else:
-            flash('already done cant do twice', 'danger')
+            flash(ALREADY_DONE, FLASH_MESSAGES['FAIL'])
     elif old_date.date() == now.date():
-        print("yes same")
         if old_date.time() < now.date():
             count += 1
             if count == 1:
-                print("fd_amount= ", fd.fd_amount)
-                print("fd_rate_interest=", fd.rate_interest)
                 amount = (fd.fd_amount * fd.rate_interest) / 100
                 account.account_balance += ((fd.fd_amount * fd.rate_interest) / 100)
                 db.session.commit()
-                flash(f"{amount} has been added", 'success')
+                flash(FD_ADDED.format(amount=amount), FLASH_MESSAGES['SUCCESS'])
             else:
-                flash('already done cant do twice', 'danger')
-            print("yes the time")
-        else:
-            print("no way time")
-    else:
-        print("no way")
-
-    print("DDSDS", fd.fd_create_date - now)
+                flash(ALREADY_DONE, FLASH_MESSAGES['FAIL'])
     return redirect(url_for('users.dashboard'))
 
 
-@users.route("/bank-statement/", methods=['GET', 'POST'])
+@users.route("user/bank-statement/", methods=['GET', 'POST'])
 @login_required
 def bank_statement():
     user = User.query.filter_by(user_name=current_user.user_name).first()
@@ -618,7 +633,7 @@ def bank_statement():
     )
 
 
-@users.route("/bank-statement-pdf/", methods=['GET', 'POST'])
+@users.route("user/bank-statement-pdf/", methods=['GET', 'POST'])
 @login_required
 def bank_statement_pdf():
     user = User.query.filter_by(user_name=current_user.user_name).first()

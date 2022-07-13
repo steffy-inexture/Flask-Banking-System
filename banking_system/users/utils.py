@@ -73,15 +73,6 @@ def add_loan_type(loan_type, loan_id):
     db.session.add(loan)
     db.session.commit()
 
-
-# add loan type
-def loan_type():
-    loan = Loan.query.filter_by(user_id=current_user.user_id).first()
-    loan_type = LoanType(loan_id=[loan.loan_id])
-    db.session.add(loan_type)
-    db.session.commit()
-
-
 # add type of insurance after applying for the insurance
 def insurance_type(insurance_type_):
     insurance = Insurance.query.filter_by(user_id=current_user.user_id).first()
@@ -92,7 +83,6 @@ def insurance_type(insurance_type_):
 
 def add_transaction_type(transaction_type, transaction_id):
     find_type = TransactionType.query.filter_by(transaction_id=transaction_id).first()
-
     if find_type:
         pass
     else:
@@ -106,8 +96,6 @@ def add_transaction_type(transaction_type, transaction_id):
 
 
 # define the decorator for authentication of particular endpoint
-
-
 def authentication_req(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):

@@ -3,7 +3,8 @@ from flask_login import login_user, login_required
 from banking_system import db, bcrypt
 from banking_system.admin.constants import ADMIN_LOGIN_SUCCESS, FLASH_MESSAGES, ADMIN_LOGIN_UNSUCCESS, USER_DELETED, \
     BRANCH_EXISTED, BRANCH_ADDED, ATM_EXISTED, ATM_ADDED, BANK_MEMBER_DELETED, BANK_MEMBER_ADDED, \
-    STATUS_UPDATE
+    STATUS_UPDATE, ROLE_ALREADY_EXIST, NEW_ROLE_ADDED, LOAN_CHOICE_ALREADY_EXIST, NEW_LOAN_CHOICE_ADDED, \
+    INSURANCE_CHOICE_ALREADY_EXIST, NEW_INSURANCE_CHOICE_ADDED
 from banking_system.admin.utils import authentication_req, add_loan_money_to_user, save_picture_about
 from banking_system.models import Atm, User, Branch, BankDetails, Account, Loan, LoanType, Insurance, InsuranceType, \
     FixedDeposit, BankMember, MemberRole, LoanDetails, InsuranceDetails
@@ -34,7 +35,7 @@ def admin_login():
 
 
 # this is admin dashboard
-@admin.route("/admin_dashboard", methods=['GET', 'POST'])
+@admin.route("admin/admin_dashboard", methods=['GET', 'POST'])
 @login_required
 @authentication_req
 def admin_dashboard():
@@ -57,7 +58,7 @@ def admin_user_data():
 
 
 # delete bank user from the user table
-@admin.route("/delete-user/<user_id>", methods=['GET', 'POST'])
+@admin.route("admin/delete-user/<user_id>", methods=['GET', 'POST'])
 @login_required
 @authentication_req
 def delete_user(user_id):
@@ -68,7 +69,7 @@ def delete_user(user_id):
 
 
 # show all branches of the bank
-@admin.route("/all-branch-data", methods=['GET', 'POST'])
+@admin.route("admin/all-branch-data", methods=['GET', 'POST'])
 @login_required
 @authentication_req
 def admin_branch_data():
@@ -78,7 +79,7 @@ def admin_branch_data():
 
 
 # show all atm of the bank
-@admin.route("/all-atm-data", methods=['GET', 'POST'])
+@admin.route("admin/all-atm-data", methods=['GET', 'POST'])
 @login_required
 @authentication_req
 def admin_atm_data():
@@ -88,7 +89,7 @@ def admin_atm_data():
 
 
 # show all loan requests from the bank users
-@admin.route("/all-loan-data", methods=['GET', 'POST'])
+@admin.route("admin/all-loan-data", methods=['GET', 'POST'])
 @login_required
 @authentication_req
 def admin_user_loan_data():
@@ -100,7 +101,7 @@ def admin_user_loan_data():
 
 
 # for approving the loan requests
-@admin.route("/loan-approval-status/<user_id>/<user_name>/<loan_id>/<loan_amount>/<rate_interest>/<paid_amount"
+@admin.route("admin/loan-approval-status/<user_id>/<user_name>/<loan_id>/<loan_amount>/<rate_interest>/<paid_amount"
              ">/<loan_type>/<loan_status>", methods=['GET', 'POST'])
 @login_required
 @authentication_req
@@ -123,7 +124,7 @@ def loan_approval(user_id,
         else:
             loan.loan_status = 'Inactive'
         db.session.commit()
-        flash(STATUS_UPDATE.format(user_name=user_name,activity= 'loan'), FLASH_MESSAGES['SUCCESS'])
+        flash(STATUS_UPDATE.format(user_name=user_name, activity='loan'), FLASH_MESSAGES['SUCCESS'])
         return redirect(url_for('admin.admin_user_loan_data'))
     elif request.method == 'GET':
         form.user_id.data = user_id
@@ -150,7 +151,7 @@ def loan_approval(user_id,
 
 
 # show all requests of the insurance from the bank users
-@admin.route("/all-insurance-data", methods=['GET', 'POST'])
+@admin.route("admin/all-insurance-data", methods=['GET', 'POST'])
 @login_required
 @authentication_req
 def admin_user_insurance_data():
@@ -163,7 +164,7 @@ def admin_user_insurance_data():
 
 # approve the insurance status for bank users
 @admin.route(
-    "/insurance-approval-status/<user_id>/<user_name>/<insurance_id>/<insurance_amount>/<insurance_type"
+    "admin/insurance-approval-status/<user_id>/<user_name>/<insurance_id>/<insurance_amount>/<insurance_type"
     ">/<insurance_status>",
     methods=['GET', 'POST'])
 @login_required
@@ -207,7 +208,7 @@ def insurance_approval(user_id,
 
 
 # show all fixed deposits data requested by the bank users
-@admin.route("/all-fd-data", methods=['GET', 'POST'])
+@admin.route("admin/all-fd-data", methods=['GET', 'POST'])
 @login_required
 @authentication_req
 def admin_user_fd_data():
@@ -219,7 +220,7 @@ def admin_user_fd_data():
                            users=users, account=account)
 
 
-@admin.route("/update-fd-status/<user_id>", methods=['GET', 'POST'])
+@admin.route("admin/update-fd-status/<user_id>", methods=['GET', 'POST'])
 @login_required
 @authentication_req
 def update_fd_status(user_id):
@@ -245,7 +246,7 @@ def update_fd_status(user_id):
     )
 
 
-@admin.route("/delete-fd/<user_id>", methods=['GET', 'POST'])
+@admin.route("admin/delete-fd/<user_id>", methods=['GET', 'POST'])
 @login_required
 @authentication_req
 def delete_fd(user_id):
@@ -258,7 +259,7 @@ def delete_fd(user_id):
 
 # approve/decline the fixed deposits requests from the bank users
 @admin.route(
-    "/fd-approval-status/<user_id>/<user_name>/<insurance_id>/<insurance_amount>/<insurance_type>/<insurance_status>",
+    "admin/fd-approval-status/<user_id>/<user_name>/<insurance_id>/<insurance_amount>/<insurance_type>/<insurance_status>",
     methods=['GET', 'POST'])
 @login_required
 @authentication_req
@@ -301,7 +302,7 @@ def fd_approval(user_id,
 
 
 # change the account status of the bank user's account [ ACTIVE / DEACTIVATE ]
-@admin.route("/change-account-status/<user_id>/<user_name>/<account_number>", methods=['GET', 'POST'])
+@admin.route("admin/change-account-status/<user_id>/<user_name>/<account_number>", methods=['GET', 'POST'])
 @login_required
 @authentication_req
 def account_status(user_id, user_name, account_number):
@@ -329,7 +330,7 @@ def account_status(user_id, user_name, account_number):
 
 
 # add new branch of the bank
-@admin.route("/add_branch", methods=['GET', 'POST'])
+@admin.route("admin/add_branch", methods=['GET', 'POST'])
 @login_required
 @authentication_req
 def add_branch():
@@ -357,7 +358,7 @@ def add_branch():
 
 
 # add new atm of the bank
-@admin.route("/add_atm", methods=['GET', 'POST'])
+@admin.route("admin/add_atm", methods=['GET', 'POST'])
 @login_required
 @authentication_req
 def add_atm():
@@ -384,7 +385,7 @@ def add_atm():
 
 
 # show all bank members of current bank
-@admin.route("/bank-show-all-member", methods=['GET', 'POST'])
+@admin.route("admin/bank-show-all-member", methods=['GET', 'POST'])
 @login_required
 @authentication_req
 def show_bank_member():
@@ -393,7 +394,7 @@ def show_bank_member():
 
 
 # add data to the about page to show the details of the bank member
-@admin.route("/bank-about-member", methods=['GET', 'POST'])
+@admin.route("admin/bank-about-member", methods=['GET', 'POST'])
 @login_required
 @authentication_req
 def bank_about_member():
@@ -421,7 +422,7 @@ def bank_about_member():
 
 
 # delete bank member from the membership of the bank
-@admin.route("/delete-bank-member/<member_id>/<member_position>", methods=['GET', 'POST'])
+@admin.route("admin/delete-bank-member/<member_id>/<member_position>", methods=['GET', 'POST'])
 @login_required
 @authentication_req
 def delete_bank_member(member_id):
@@ -433,7 +434,7 @@ def delete_bank_member(member_id):
 
 
 # add new insurance detail for choices [ personal loan, education loan ] of the bank
-@admin.route("/show_member_role_list", methods=['GET', 'POST'])
+@admin.route("admin/show_member_role_list", methods=['GET', 'POST'])
 @login_required
 @authentication_req
 def show_member_role_list():
@@ -443,7 +444,7 @@ def show_member_role_list():
 
 
 # add new insurance detail for choices [ personal loan, education loan ] of the bank
-@admin.route("/show_loan_choices", methods=['GET', 'POST'])
+@admin.route("admin/show_loan_choices", methods=['GET', 'POST'])
 @login_required
 @authentication_req
 def show_loan_choices():
@@ -453,7 +454,7 @@ def show_loan_choices():
 
 
 # add new insurance detail for choices [ personal loan, education loan ] of the bank
-@admin.route("/show_insurance_choices", methods=['GET', 'POST'])
+@admin.route("admin/show_insurance_choices", methods=['GET', 'POST'])
 @login_required
 @authentication_req
 def show_insurance_choices():
@@ -463,7 +464,7 @@ def show_insurance_choices():
 
 
 # add new bank member role of the bank
-@admin.route("/add-bank-role", methods=['GET', 'POST'])
+@admin.route("admin/add-bank-role", methods=['GET', 'POST'])
 @login_required
 @authentication_req
 def member_role_list():
@@ -472,20 +473,20 @@ def member_role_list():
         role_name = form.role_name.data
         role = MemberRole.query.filter_by(member_role=role_name).first()
         if role:
-            flash("this role is already exist", 'danger')
+            flash(ROLE_ALREADY_EXIST, FLASH_MESSAGES['FAIL'])
             return redirect(url_for('admin.admin_dashboard'))
         else:
             add_role = MemberRole(member_role=role_name)
             db.session.add(add_role)
             db.session.commit()
-            flash("new role has been added", 'success')
+            flash(NEW_ROLE_ADDED, FLASH_MESSAGES['SUCCESS'])
             return redirect(url_for('admin.admin_dashboard'))
 
     return render_template('add_member_role_list.html', title='add-member-role-list', form=form)
 
 
 # add new loan detail for choices [ personal loan, education loan ] of the bank
-@admin.route("/add-loan-options", methods=['GET', 'POST'])
+@admin.route("admin/add-loan-options", methods=['GET', 'POST'])
 @login_required
 @authentication_req
 def loan_choices():
@@ -494,20 +495,20 @@ def loan_choices():
         loan_choice = form.loan_choice.data
         loan = LoanDetails.query.filter_by(loan_name=loan_choice).first()
         if loan:
-            flash("this loan is already exist", 'danger')
+            flash(LOAN_CHOICE_ALREADY_EXIST, FLASH_MESSAGES['FAIL'])
             return redirect(url_for('admin.admin_dashboard'))
         else:
             add_loan = LoanDetails(loan_name=loan_choice)
             db.session.add(add_loan)
             db.session.commit()
-            flash("new loan detail has been added", 'success')
+            flash(NEW_LOAN_CHOICE_ADDED, FLASH_MESSAGES['SUCCESS'])
             return redirect(url_for('admin.admin_dashboard'))
 
     return render_template('add_loan_choice_list.html', title='add-loan-choice-list', form=form)
 
 
 # add new insurance detail for choices [ personal loan, education loan ] of the bank
-@admin.route("/add-insurance-options", methods=['GET', 'POST'])
+@admin.route("admin/add-insurance-options", methods=['GET', 'POST'])
 @login_required
 @authentication_req
 def insurance_choices():
@@ -516,13 +517,13 @@ def insurance_choices():
         insurance_choice = form.insurance_choice.data
         insurance = InsuranceDetails.query.filter_by(insurance_name=insurance_choice).first()
         if insurance:
-            flash("this insurance is already exist", 'danger')
+            flash(INSURANCE_CHOICE_ALREADY_EXIST, FLASH_MESSAGES['FAIL'])
             return redirect(url_for('admin.admin_dashboard'))
         else:
             add_insurance = InsuranceDetails(insurance_name=insurance_choice)
             db.session.add(add_insurance)
             db.session.commit()
-            flash("new insurance detail has been added", 'success')
+            flash(NEW_INSURANCE_CHOICE_ADDED, FLASH_MESSAGES['SUCCESS'])
             return redirect(url_for('admin.admin_dashboard'))
 
     return render_template('add_insurance_choice_list.html', title='add-loan-choice-list', form=form)

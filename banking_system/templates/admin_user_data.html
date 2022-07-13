@@ -5,7 +5,6 @@ NOTE: YOU CAN ONLY DELETE USER IF THEY HAVE 0.0 ACCOUNT BALANCE
 <br>
 <hr>
 <div class="container">
-
     </button>
     <div class="row">
           <br>
@@ -30,7 +29,6 @@ NOTE: YOU CAN ONLY DELETE USER IF THEY HAVE 0.0 ACCOUNT BALANCE
                                                     user_id=user.user_id,
                                                     user_name=user.user_name,
                                                     account_number=account.account_number)}}">{{account.account_status}}</a></button>   </pre></td>&nbsp;
-
                         {% if account.account_balance!=0.0 %}
                         <td><pre><button>not delete</button> </pre></td>
                         {% else %}
@@ -38,10 +36,7 @@ NOTE: YOU CAN ONLY DELETE USER IF THEY HAVE 0.0 ACCOUNT BALANCE
                                                     user_id=user.user_id)}}">delete</button> </pre></td>
                         {% endif %}
                         {% endif %}
-
                         {% endfor%}
-
-
                         <td><pre>  </pre></td>&nbsp;
                     </tr>
                     {%endif%}

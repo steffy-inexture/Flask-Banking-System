@@ -22,6 +22,11 @@ SUCCESS_ACTIVITY = 'Your {activity} has been requested with inactive status'
 PENDING_ACTIVITY = 'You have already current {activity} already'
 BRANCH_CHANGED = 'Bank branch has been updated/changed'
 ERROR = 'There is some error'
+SOMETHING_WENT_WRONG = "something went wrong"
+SUCCESSFUL_TRANSACTION = 'Transaction Successfully'
+WRONG_OTP = 'Transaction Unsuccessfully as otp is wrong'
+ALREADY_DONE = 'already done cant do twice'
+FD_ADDED = "{amount} has been added"
 
 FLASH_MESSAGES = {
     'SUCCESS': 'success',
