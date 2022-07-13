@@ -1,3 +1,4 @@
+import subprocess
 from os.path import exists
 
 import pdfkit
@@ -633,12 +634,10 @@ def bank_statement_pdf():
         transaction_type=transaction_type
     )
 
-    if exists('./bin/wkhtmltopdf'):
-        config = pdfkit.configuration(wkhtmltopdf='./bin/wkhtmltopdf')
-    else:
-        config = None
-    print(f"CONFIG {config}")
-    pdf = pdfkit.from_string(render, False, configuration=config)
+    WKHTMLTOPDF_CMD = subprocess.Popen(['which', './bin/wkhtmltopdf'], stdout=subprocess.PIPE).communicate()[0].strip()
+    print(f"CONFIG {WKHTMLTOPDF_CMD}")
+    pdfkit_config = pdfkit.configuration(wkhtmltopdf=WKHTMLTOPDF_CMD)
+    pdf = pdfkit.from_string(render, False, configuration=pdfkit_config)
     response = make_response(pdf)
     response.headers["Content-Type"] = "application/pdf"
     response.headers["Content-Disposition"] = "attachment;filename=bank_statement.pdf"
