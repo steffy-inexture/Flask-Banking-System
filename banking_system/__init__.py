@@ -5,7 +5,6 @@ from flask_login import LoginManager
 from flask_mail import Mail
 from banking_system.config import Config
 
-
 db = SQLAlchemy()
 bcrypt = Bcrypt()
 
