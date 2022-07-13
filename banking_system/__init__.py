@@ -27,12 +27,12 @@ def create_app(config_class=Config):
     from banking_system.main.routes import main
     from banking_system.about.routes import about
     from banking_system.admin.routes import admin
-    from banking_system.errors.handlers import errors
+    # from banking_system.errors.handlers import errors
 
     app.register_blueprint(users)
     app.register_blueprint(main)
     app.register_blueprint(about)
     app.register_blueprint(admin)
-    app.register_blueprint(errors)
+    # app.register_blueprint(errors)
 
     return app
