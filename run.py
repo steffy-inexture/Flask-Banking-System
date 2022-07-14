@@ -1,3 +1,5 @@
+import unittest
+
 from banking_system import create_app, db
 from flask_migrate import Migrate
 
