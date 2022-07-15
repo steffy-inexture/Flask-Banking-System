@@ -34,13 +34,7 @@
                         <td><pre>{{insurance.insurance_amount}}  </pre></td>&nbsp;
                         <td><pre>{{insurancetype.insurance_type}}  </pre></td>&nbsp;
                         <td><pre><button>{{insurance.insurance_status}}  </pre></button></td>&nbsp;
-                        <td><pre><button><a href="{{url_for('admin.insurance_approval',
-                                                    user_id=user.user_id,
-                                                    user_name=user.user_name,
-                                                    insurance_id=insurance.insurance_id,
-                                                    insurance_amount=insurance.insurance_amount,
-                                                    insurance_type=insurancetype.insurance_type,
-                                                    insurance_status=insurance.insurance_status)}}">Aprroval status</a>  </pre></button></td>&nbsp;
+                        <td><pre><button><a href="{{url_for('admin.insurance_approval',user_id=user.user_id)}}">Approval status</a>  </pre></button></td>&nbsp;
                         {% endif %}
                         {% endfor %}
 

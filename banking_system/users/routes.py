@@ -14,7 +14,7 @@ import random
 import datetime
 from banking_system.users.constants import FLASH_MESSAGES, NEW_USER_ADDED, SUCCESSFUL_REGISTRATION, \
     ADMIN_NOT_ACTIVATE_UR_ACCOUNT, SUCCESSFUL_LOGIN, UNSUCCESSFUL_LOGIN, LOGOUT_SUCCESS, ACCOUNT_UPDATED, EMAIL_INFO, \
-    INVALID_TOKEN, PASSWORD_UPDATED, ACCOUNT_ALREADY_EXISTED, ACCOUNT_CREATED, LOGIN_FIRST, ALREADY_CARD_EXISTED, \
+    INVALID_TOKEN, PASSWORD_UPDATED, LOGIN_FIRST, ALREADY_CARD_EXISTED, \
     CARD_CREATED, TRANSACTION_SUCCESSFULLY, CANT_TRANSFER, \
     PASSWORD_INCORRECT, INSUFFICIENT_BALANCE, PENDING_ACTIVITY, SUCCESS_ACTIVITY, BRANCH_CHANGED, ERROR, \
     SOMETHING_WENT_WRONG, SUCCESSFUL_TRANSACTION, WRONG_OTP, ALREADY_DONE, FD_ADDED
@@ -69,7 +69,6 @@ def register():
     return render_template('register.html', title='Register', form=form)
 
 
-# create the bank account at the initial stage
 @users.route("/user/registration/account-creation", methods=['GET', 'POST'])
 def account_creation(user_id):
     """
@@ -96,16 +95,24 @@ def account_creation(user_id):
     db.session.commit()
 
 
-# for change the account selected default first branch
 @users.route("/user/change_branch", methods=['GET', 'POST'])
 @login_required
 def change_branch():
+    """
+        User can change his/her bank account's branch
+        Given: the list of bank branches [ added by the bank admin ]
+        form: ChangeBranch
+        user can choose that desired branch and submit
+        templates: change_branch.html [ for taking form data from user ]
+        redirects to:
+            After successfully change: user.dashboard [ user route ]
+            After Unsuccessfully attempt [ any error ]: user.dashboard [ user route ]
+    """
     user = User.query.filter_by(user_id=current_user.user_id).first()
     account = Account.query.filter_by(user_id=current_user.user_id).first()
     branches = Branch.query.all()
     form = ChangeBranch()
     if form.validate_on_submit():
-        print("this is branch selected by the user: ", form.myField.data)
         selected_branch = form.myField.data
         branch = Branch.query.filter_by(branch_name=selected_branch).first()
         if branch:
@@ -123,9 +130,17 @@ def change_branch():
     return render_template('change_branch.html', user=user, account=account, branches=branches, form=form)
 
 
-# Login route to log in registered user to the website
 @users.route("/login", methods=['GET', 'POST'])
 def login():
+    """
+        User login
+        User can log in only after admin set his/her status as active
+        form:LoginForm
+        templates: login.html [ for taking user credential ex: user email and password ]
+        REDIRECTS TO:
+            After success: user.dashboard [ user route ]
+            After Unsuccess: user.login [ with flashing the error ]
+    """
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(user_email=form.user_email.data).first()
@@ -144,10 +159,14 @@ def login():
     return render_template('login.html', title='login', form=form)
 
 
-# User dashboard to show all the functionalities which is performed by the user only
 @users.route("/user-dashboard", methods=['GET', 'POST'])
 @login_required
 def dashboard():
+    """
+        dashboard route
+        shows the different function which can be performed by the user side
+        ex: requests,transaction,CRUD Operation on some basic data of user
+    """
     account = Account.query.filter_by(user_id=current_user.user_id).first()
     if account:
         card = Card.query.filter_by(account_number=account.account_number).first()
@@ -172,19 +191,30 @@ def dashboard():
             transaction_type=transaction_type)
 
 
-# logout route to log out the session after login and all procedure
 @users.route("/user/logout")
 @login_required
 def logout():
+    """
+        Logout Route
+        to log out the current user from the session
+        redirects to:
+            main.home [ website's main page ]
+    """
     logout_user()
     flash(LOGOUT_SUCCESS, FLASH_MESSAGES['SUCCESS'])
     return redirect(url_for('main.home'))
 
 
-# Profile route to see the personal data of any user
 @users.route("/profile", methods=['GET', 'POST'])
 @login_required
 def profile():
+    """
+        To update the particular data which is relates to user [ only by user ]
+        form: UpdateAccountForm
+        template: user_profile.html [ to update the desired information by user ]
+        redirects to:
+            user.dashboard [ user route ]
+    """
     form = UpdateAccountForm()
     if form.validate_on_submit():
         current_user.user_name = form.user_name.data
@@ -196,7 +226,11 @@ def profile():
         current_user.date_of_birth = form.date_of_birth.data
         db.session.commit()
         flash(ACCOUNT_UPDATED, FLASH_MESSAGES['SUCCESS'])
-        return redirect(url_for('users.dashboard'))
+        if current_user.user_email != 'steffy.inexture@gmail.com':
+            return redirect(url_for('users.dashboard'))
+        else:
+            return redirect(url_for('admin.admin_dashboard'))
+
     elif request.method == 'GET':
         form.user_name.data = current_user.user_name
         form.user_phone_number.data = current_user.user_phone_number
@@ -210,9 +244,15 @@ def profile():
     return render_template('user_profile.html', title='Account', form=form)
 
 
-# reset password request for the ser
 @users.route("/reset_password", methods=['GET', 'POST'])
 def reset_request():
+    """
+        sends the reset password requests to the user email
+        form: RequestResetForm
+        templates: reset_request.html [ for get the data ]
+        function: send_reset_email(user) --> takes user arg.[ sends email with link reference]
+        redirects to: user.login
+    """
     if current_user.is_authenticated:
         return redirect(url_for('main.home'))
     form = RequestResetForm()
@@ -226,6 +266,11 @@ def reset_request():
 
 @users.route("/reset_password/<token>", methods=['GET', 'POST'])
 def reset_token(token):
+    """
+        This is going to be used in reset password request
+        if user exist and authentication is okay then and only its says valid
+        else throwing invalid user error.
+    """
     if current_user.is_authenticated:
         return redirect(url_for('main.home'))
 
@@ -244,36 +289,12 @@ def reset_token(token):
     return render_template('reset_token.html', title='Reset Password', form=form)
 
 
-@users.route("/request-account", methods=['GET', 'POST'])
-def request_account():
-    if current_user.is_authenticated:
-        account = Account.query.filter_by(user_id=current_user.user_id)
-        if account:
-            flash(ACCOUNT_ALREADY_EXISTED, FLASH_MESSAGES['FAIL'])
-            return redirect(url_for('users.dashboard'))
-        else:
-            user = User.query.filter_by(user_id=current_user.user_id).first()
-            branch = Branch.query.first()
-            branch_id = branch.branch_id
-            account = db.session.query(func.max(Account.account_number)).first()
-            if account[0]:
-                account_number = account[0] + 1
-            else:
-                account_number = 1000000
-            account = Account(account_number=account_number, user_id=user.user_id, branch_id=branch_id)
-            db.session.add(account)
-            db.session.commit()
-            flash(ACCOUNT_CREATED, FLASH_MESSAGES['SUCCESS'])
-            return redirect(url_for('users.dashboard'))
-    else:
-        flash(LOGIN_FIRST, FLASH_MESSAGES['FAIL'])
-        return redirect('main.home')
-
-
-# Request for the card if not have carded yet
 @users.route("/user/request-card", methods=['GET', 'POST'])
 @login_required
 def request_card():
+    """
+        Request for the card if not have carded yet
+    """
     if current_user.is_authenticated:
         account = Account.query.filter_by(user_id=current_user.user_id).first()
         if account:
@@ -306,11 +327,16 @@ def request_card():
         return redirect('main.home')
 
 
-# apply for loan via this route [ request goes to admin panel with INACTIVE STATUS]
-# giving the PERSONAL/EDUCATION/HOME/OTHER loan option right now
 @users.route("/user/apply-for-loan", methods=['GET', 'POST'])
 @login_required
 def apply_loan():
+    """
+         apply for loan via this route [ request goes to admin panel with INACTIVE STATUS]
+         giving the PERSONAL/EDUCATION/HOME/OTHER loan option [ added by the admin ]
+         forms:ApplyLoanForm
+         templates: applyloan.html
+         redirects to: users.dashboard [ user route ]
+    """
     form = ApplyLoanForm()
     user = User.query.filter_by(user_id=current_user.user_id).first()
     if form.validate_on_submit():
@@ -358,10 +384,16 @@ def apply_loan():
     )
 
 
-# Request for insurance requested to admin panel with INACTIVE STATUS
 @users.route("/user/request-insurance", methods=['GET', 'POST'])
 @login_required
 def request_insurance():
+    """
+        apply for insurance via this route [ request goes to admin panel with INACTIVE STATUS]
+        giving the LIFE/PERSONAL/EDUCATION/HOME/OTHER insurance option [ added by the admin ]
+        forms:ApplyInsuranceForm
+        templates: applyinsurance.html
+        redirects to: users.dashboard [ user route ]
+    """
     form = ApplyInsuranceForm()
     user = User.query.filter_by(user_id=current_user.user_id).first()
     if form.validate_on_submit():
@@ -403,10 +435,16 @@ def request_insurance():
     )
 
 
-# add fixed deposit
 @users.route("/user/add_fixed_deposit", methods=['GET', 'POST'])
 @login_required
 def add_fixed_deposit():
+    """
+        Add fixed deposit by using ths route
+        goes to the admin side with INACTIVE Status [ initially ]
+        redirects to: users.dashboard [ user route ] (if succeed)
+                      users.main [ user route ] (if not succeed)
+    """
+
     if current_user.is_authenticated:
         account = Account.query.filter_by(user_id=current_user.user_id).first()
         fixed_deposit = FixedDeposit(account_number=account.account_number)
@@ -419,10 +457,17 @@ def add_fixed_deposit():
         return redirect('main.home')
 
 
-# add_money
 @users.route("/user/add-money-to-other", methods=['GET', 'POST'])
 @login_required
 def add_money():
+    """
+        Transfer money from current user to another bank user account
+        forms:AddMoney
+        templates: add_money.html
+        function: add_transaction_type [ to add transaction type "debit" to the transaction type ]
+        redirects to: users.dashboard [ user route ] --> if succeed
+                      user.add_money [ user route ] --> if not succeed
+    """
     form = AddMoney()
     if form.validate_on_submit():
         if form.user_password.data == current_user.user_password:
@@ -464,10 +509,24 @@ def add_money():
     return render_template('add_money.html', title='add_money', form=form)
 
 
-# transfer money
 @users.route("/user/transfer-money", methods=['GET', 'POST'])
 @login_required
 def transfer_money():
+    """
+        Transfer money from user to some other data
+            1.account balance -> saving balance
+            2.saving balance -> account balance
+            1.account balance -> pay loan
+            1.account balance -> fixed deposit
+        forms:TransferMoney
+        templates: transfermoney.html
+        params:
+            user = current user data from 'User' table
+            account = user account detail from 'Account' table
+            loan = co-related loan data for user
+            fd = co-related fd data for user
+        redirects to: users.otp_check [ user route ] for checkin the user otp send to user email
+    """
     user = User.query.filter_by(user_id=current_user.user_id).first()
     account = Account.query.filter_by(user_id=user.user_id).first()
     loan = Loan.query.filter_by(user_id=user.user_id).first()
@@ -508,22 +567,6 @@ def transfer_money():
         send_otp_email(current_user)
         return redirect(url_for('users.otp_check'))
 
-        # transfer = Transaction(
-        #     user_id=user.user_id,
-        #     transaction_amount=transfer_amount,
-        #     sender_id=user.user_id,
-        #     receiver_id=user.user_id,
-        # )
-        # db.session.add(transfer)
-        # db.session.commit()
-        #
-        # add_transaction_type(
-        #     transaction_id=transfer.transaction_id,
-        #     transaction_type=transaction_type)
-        #
-        # flash('transaction done', 'success')
-        # return redirect(url_for('users.dashboard'))
-
     elif request.method == 'GET':
         form.user_id.data = user.user_id
         form.user_name.data = user.user_name
@@ -536,8 +579,13 @@ def transfer_money():
 @users.route("/user/otp-check", methods=['GET', 'POST'])
 @login_required
 def otp_check():
+    """
+        check the otp sends to the user email
+        forms:OtpCheck
+        templates: otp_check.html
+        redirects to: users.dashboard [ user route ]
+    """
     form = OtpCheck()
-    print("form checked")
     if form.validate_on_submit():
         user_id = form.user_id.data
         transaction_amount = form.transaction_amount.data
@@ -588,6 +636,10 @@ count = 0
 @users.route("/fd-money-transfer/", methods=['GET', 'POST'])
 @login_required
 def fd_interest_money():
+    """
+        add the interested money which is get by particular time duration
+        only after admin activated the fd
+    """
     global count
     account = Account.query.filter_by(user_id=current_user.user_id).first()
     fd = FixedDeposit.query.filter_by(account_number=account.account_number).first()
@@ -618,6 +670,11 @@ def fd_interest_money():
 @users.route("/user/bank-statement/", methods=['GET', 'POST'])
 @login_required
 def bank_statement():
+    """
+        shows the past transaction's data of the current user
+        template: bank_statement.html
+        redirect to: bank_statement.html page
+    """
     user = User.query.filter_by(user_name=current_user.user_name).first()
     account = Account.query.filter_by(user_id=user.user_id).first()
     transactions = Transaction.query.filter_by(user_id=user.user_id).all()
@@ -634,6 +691,10 @@ def bank_statement():
 @users.route("/user/bank-statement-pdf/", methods=['GET', 'POST'])
 @login_required
 def bank_statement_pdf():
+    """
+        downloads the pdf for user's bank statement data
+        bank statement is the history of money transactions.
+    """
     user = User.query.filter_by(user_name=current_user.user_name).first()
     account = Account.query.filter_by(user_id=user.user_id).first()
     transactions = Transaction.query.filter_by(user_id=user.user_id).all()

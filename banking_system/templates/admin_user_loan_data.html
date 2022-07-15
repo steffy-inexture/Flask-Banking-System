@@ -39,14 +39,7 @@
                         <td><pre>{{loantype.loan_type}}  </pre></td>&nbsp;
                         <td><pre><button>{{loan.loan_status}}  </pre></button></td>&nbsp;
                         <td><pre><button><a href="{{url_for('admin.loan_approval',
-                                                    user_id=user.user_id,
-                                                    user_name=user.user_name,
-                                                    loan_id=loan.loan_id,
-                                                    loan_amount=loan.loan_amount,
-                                                    rate_interest=loan.rate_interest,
-                                                    paid_amount=loan.paid_amount,
-                                                    loan_type=loantype.loan_type,
-                                                    loan_status=loan.loan_status)}}">Aprroval status</a>  </pre></button></td>&nbsp;
+                                                    user_id=user.user_id)}}">Aprroval status</a>  </pre></button></td>&nbsp;
                         {% endif %}
                         {% endfor %}
 

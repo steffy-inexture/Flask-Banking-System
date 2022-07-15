@@ -39,8 +39,6 @@
                                         <td><pre><button>not delete</button> </pre></td>
                                         {% else %}
                                         <td><pre><button id="demodelete")>delete</button> </pre></td>
-<!--                                        <p id="demo"></p>-->
-
                                         <a id="delete" href="{{url_for('admin.delete_fd',user_id=user.user_id)}}"></a>
 
                                         {% endif %}
@@ -54,28 +52,4 @@
                 <hr>
             </div>
     </div>
-
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript">
-    $(function()
-
-        {
-            $('#demodelete').click(function()
-            {
-                console.log("yheh")
-                var confirm = confirm("Are you sure?");
-                if (confirm == true)
-                    {
-                    $.ajax({
-<!--                    console.log(user_id)-->
-                        url: '/delete_fd/user.user_id',
-<!--                        url: '/delete_fd/'+user_id,-->
-<!--                        url: {{url_for('admin.delete_fd',user_id=user_id)}}-->
-                        success: function(response)
-                        {
-                            console.log(response);
-                        }});
-                    }
-            });
-    });
-</script>
 {% endblock content %}
