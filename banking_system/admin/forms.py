@@ -5,16 +5,21 @@ from wtforms import StringField, PasswordField, SubmitField, BooleanField, Integ
 from wtforms.validators import DataRequired, Email
 
 
-# login form for the admin
 class LoginForm(FlaskForm):
+    """
+        login form to take the user login data
+    """
     user_email = StringField('Email', validators=[DataRequired(), Email()])
     user_password = PasswordField('Password', validators=[DataRequired()])
     remember = BooleanField('Remember Me')
     submit = SubmitField('Login IN')
 
 
-# change the account status for the bank user
 class UserAccountStatus(FlaskForm):
+    """
+        Admin can change the user's bank account status
+        1. Active or 2. Inactive
+    """
     user_id = StringField('User_id', validators=[DataRequired()], render_kw={'readonly': True})
     user_name = StringField('User_name', validators=[DataRequired()], render_kw={'readonly': True})
     account_number = StringField('Account_number', validators=[DataRequired()], render_kw={'readonly': True})
@@ -22,8 +27,11 @@ class UserAccountStatus(FlaskForm):
     submit = SubmitField('Submit the changes')
 
 
-# loan approving for the bank user through admin panel only
 class LoanApprovalStatus(FlaskForm):
+    """
+        Admin can give approval to the user's bank Loan
+        1. Approve [ active ] or 2. Decline [ Inactive ]
+    """
     user_id = StringField('User_id', validators=[DataRequired()], render_kw={'readonly': True})
     user_name = StringField('User name', validators=[DataRequired()], render_kw={'readonly': True})
     loan_id = StringField('Loan id', validators=[DataRequired()], render_kw={'readonly': True})
@@ -36,8 +44,11 @@ class LoanApprovalStatus(FlaskForm):
     submit = SubmitField('Submit the changes')
 
 
-# approve insurance request which is sent by bank user
 class InsuranceApprovalForm(FlaskForm):
+    """
+        Admin can give approval to the user's Insurance
+        1. Approve [ active ] or 2. Decline [ Inactive ]
+    """
     user_id = StringField('User_id', validators=[DataRequired()], render_kw={'readonly': True})
     user_name = StringField('User name', validators=[DataRequired()], render_kw={'readonly': True})
     insurance_id = StringField('Insurance id', validators=[DataRequired()], render_kw={'readonly': True})
@@ -48,8 +59,11 @@ class InsuranceApprovalForm(FlaskForm):
     submit = SubmitField('Submit the changes')
 
 
-# update the user's FD details
 class UpdateFdStatus(FlaskForm):
+    """
+        Admin can give update to the user's fd status
+        1. Active or 2. Inactive
+    """
     user_id = StringField('User_id', validators=[DataRequired()], render_kw={'readonly': True})
     user_name = StringField('User name', validators=[DataRequired()], render_kw={'readonly': True})
     fd_id = StringField('User name', validators=[DataRequired()], render_kw={'readonly': True})
@@ -58,21 +72,29 @@ class UpdateFdStatus(FlaskForm):
     submit = SubmitField('Update the Fd detail')
 
 
-# add new branch of bank
 class AddBranch(FlaskForm):
+    """
+        Admin can add new bank branch
+        with no duplication
+    """
     branch_name = StringField('branch name: ', validators=[DataRequired()])
     branch_address = StringField('Branch addresses: ', validators=[DataRequired()])
     submit = SubmitField('Add this branch')
 
 
-# admin can add new atm of the bank
 class AddAtm(FlaskForm):
+    """
+        Admin can add new bank atm
+        with no duplication
+    """
     atm_address = StringField('Atm address: ', validators=[DataRequired()])
     submit = SubmitField('Add this atm')
 
 
-# about bank member data
 class BankMemberData(FlaskForm):
+    """
+            Admin can add new bank member
+    """
     image_file = FileField('add photo: ', validators=[DataRequired(), FileAllowed(['jpg', 'png', 'jpeg'])])
     bank_member_name = StringField('Member name: ', validators=[DataRequired()])
     bank_member_position = SelectField('Member Position', choices=[], validators=[DataRequired()],
@@ -84,19 +106,28 @@ class BankMemberData(FlaskForm):
     submit = SubmitField('Update the members')
 
 
-# admin can add member role of the bank
 class AddMemberRole(FlaskForm):
+    """
+        Admin can add new bank member role which is assign to bank member afterwords
+        with no duplication
+    """
     role_name = StringField('Role : ', validators=[DataRequired()])
     submit = SubmitField('Add this to role list')
 
 
-# admin can add loan choice of the bank
 class LoanChoice(FlaskForm):
+    """
+        Admin can add new bank Loan choices which is further used by user to apply loans
+        with no duplication
+    """
     loan_choice = StringField('Loan name : ', validators=[DataRequired()])
     submit = SubmitField('Add this to Loan choice list')
 
 
-# admin can add loan choice of the bank
 class InsuranceChoice(FlaskForm):
+    """
+        Admin can add new bank Insurance choices which is further used by user to apply Insurance
+        with no duplication
+    """
     insurance_choice = StringField('insurance name : ', validators=[DataRequired()])
     submit = SubmitField('Add this to insurance choice list')

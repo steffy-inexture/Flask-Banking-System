@@ -8,10 +8,12 @@ from banking_system import db
 from banking_system.models import User, Account, Transaction, TransactionType
 
 
-# define the decorator for authentication of particular endpoint which is used by only user
 def authentication_req(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
+        """
+            define the decorator for authentication of particular endpoint which is used by only user
+        """
         if current_user is None:
             flash("you need to login first", 'danger')
             return redirect(url_for('main.home', next=request.url))
@@ -24,8 +26,10 @@ def authentication_req(f):
     return decorated_function
 
 
-# add loan amount to the user's account balance transfer
 def add_loan_money_to_user(user_id, loan_amount, loan_type):
+    """
+        add loan amount to the user's account balance transfer
+    """
     user = User.query.filter_by(user_id=user_id).first()
     account = Account.query.filter_by(user_id=user.user_id).first()
     account.account_balance += int(loan_amount)
@@ -39,8 +43,10 @@ def add_loan_money_to_user(user_id, loan_amount, loan_type):
     db.session.commit()
 
 
-# save image of the bank member fetched from the form data into static pic folder
 def save_picture_about(form_picture):
+    """
+        saves image of the bank member fetched from the form data into static pic folder
+    """
     random_hex = secrets.token_hex(8)
     _, f_ext = os.path.splitext(form_picture.filename)
     picture_fn = random_hex + f_ext

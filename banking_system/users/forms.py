@@ -8,6 +8,14 @@ from banking_system.users.utils import CustomValidation
 
 
 class RegistrationForm(FlaskForm, CustomValidation):
+    """
+            Registrationform to take user information
+            validations:
+                validate_user_name - validate the username must be >2 length
+                validate_user_email - validate the user_email must b valid and existed id with no duplication
+                validate_user_phone_number - must be length of 10
+                validate_confirm_password - must be same as user_password
+    """
     user_name = StringField('Username: ', validators=[DataRequired(), Length(min=2, max=20)])
     user_email = StringField('Email: ', validators=[DataRequired(), Email()])
     user_phone_number = IntegerField('Phone number: ', validators=[DataRequired()])
@@ -36,16 +44,22 @@ class RegistrationForm(FlaskForm, CustomValidation):
             raise ValidationError('Confirm passwd must be equal to paasword')
 
 
-# login form for login
 class LoginForm(FlaskForm):
+    """
+        Loginform to take user credential to log in to the website
+        with valid user data only
+    """
     user_email = StringField('Email', validators=[DataRequired(), Email()])
     user_password = PasswordField('Password', validators=[DataRequired()])
     remember = BooleanField('Remember Me')
     submit = SubmitField('Login')
 
 
-# update the suer profile
 class UpdateAccountForm(FlaskForm):
+    """
+        UpdateAccountForm form
+        Update the user account information
+    """
     user_name = StringField('Username: ', validators=[DataRequired(), Length(min=2, max=20)])
     user_email = StringField('Email: ', validators=[DataRequired(), Email()], render_kw={'readonly': True})
     user_phone_number = IntegerField('Phone number: ', validators=[DataRequired()])
@@ -78,15 +92,21 @@ class RequestResetForm(FlaskForm):
             raise ValidationError('There is no account with that email. YOu must register first! ')
 
 
-# reset password
 class ResetPasswordForm(FlaskForm):
+    """
+        ResetPasswordForm form
+        To reset the user password information
+    """
     user_password = PasswordField('Password', validators=[DataRequired()])
     confirm_password = PasswordField('confirm password', validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Reset Password')
 
 
-# applyforloan form
 class ApplyLoanForm(FlaskForm):
+    """
+        Apply for loan using this form
+        with valid choices opted by user
+    """
     user_id = StringField('Your id: ', render_kw={'readonly': True})
     user_name = StringField('Your name: ', render_kw={'readonly': True})
     loan_amount_choices = RadioField('Available Loans',
@@ -102,8 +122,11 @@ class ApplyLoanForm(FlaskForm):
     submit = SubmitField('Apply for loan')
 
 
-# applyforloan form
 class ApplyInsuranceForm(FlaskForm):
+    """
+        Apply for Insurance using this form
+        with valid choices opted by user
+    """
     user_id = StringField('Your id: ', render_kw={'readonly': True})
     user_name = StringField('Your name: ', render_kw={'readonly': True})
     insurance_amount_choices = RadioField('Available Insurance amount',
@@ -118,8 +141,10 @@ class ApplyInsuranceForm(FlaskForm):
     submit = SubmitField('Apply for Insurance')
 
 
-# add money to another account holder
 class AddMoney(FlaskForm):
+    """
+           AddMoney to other bank user account
+    """
     reciver_account = IntegerField('Enter receiver account number: ', validators=[DataRequired()])
     credit_amount = IntegerField('Amount you wanna add: ', validators=[DataRequired()])
     user_password = PasswordField('Enter Password', validators=[DataRequired()])
@@ -133,9 +158,15 @@ class AddMoney(FlaskForm):
             raise ValidationError('No account is exist in this number')
 
 
-# Transfer money from acc->saving
-# Transfer money to pay loan or add fixed deposits
 class TransferMoney(FlaskForm):
+    """
+        TransferMoney Form
+        to transfer money with given options
+        here '1': 'Account to saving'
+             '2': 'Saving to account'
+             '3': 'Account to pay loan'
+             '4: 'Account to Fd'
+    """
     user_id = IntegerField('user idL ', render_kw={'readonly': True})
     user_name = StringField('User name: ', render_kw={'readonly': True})
     transfer_choice = RadioField('Transaction choice',
@@ -193,8 +224,10 @@ class TransferMoney(FlaskForm):
             raise ValidationError('Password incorrect')
 
 
-# change the branch
 class ChangeBranch(FlaskForm):
+    """
+        User can change the bank branch by selecting myField option here
+    """
     user_id = IntegerField('User id:  ', validators=[DataRequired()], render_kw={'readonly': True})
     user_name = StringField('User name ', validators=[DataRequired()], render_kw={'readonly': True})
     account_number = StringField('Account number', validators=[DataRequired()], render_kw={'readonly': True})
@@ -202,8 +235,11 @@ class ChangeBranch(FlaskForm):
     submit = SubmitField('Change the bank branch')
 
 
-# Otp moderation
 class OtpCheck(FlaskForm):
+    """
+        User can cross-check the Otp from mail and typing in this from
+        if correct then and only money can transfer
+    """
     user_id = IntegerField('User id:  ', render_kw={'readonly': True})
     transaction_amount = IntegerField('Transaction amount:  ',
                                       render_kw={'readonly': True})

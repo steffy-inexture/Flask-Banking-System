@@ -13,6 +13,10 @@ from flask import request, redirect, url_for
 
 
 def send_reset_email(user):
+    """
+        SEND MAIL TO CURRENT USER'S MAIL ID
+        for changing the user's password
+    """
     token = user.get_reset_token()
     msg = Message('Password REset Request', sender='steffykhristi.18.ce@iite.indusuni.ac.in',
                   recipients=[user.user_email])
@@ -25,6 +29,11 @@ If you did not make this request then just ignore this msg and no change will be
 
 
 def send_otp_email(user):
+    """
+        SEND MAIL TO CURRENT USER'S MAIL ID
+        for transaction otp
+    """
+
     otp = random.randint(1111, 9999)
     msg = Message('Your OTP is here: ', sender='steffykhristi.18.ce@iite.indusuni.ac.in',
                   recipients=[user.user_email])
@@ -40,8 +49,10 @@ def send_otp_email(user):
     return otp
 
 
-# custom validations for form fields validation check which is repeated
 class CustomValidation:
+    """
+        custom validations for form fields validation check which is repeated
+    """
 
     def validate_user_name(self, user_name):
         user = User.query.filter_by(user_name=user_name.data).first()
@@ -59,22 +70,28 @@ class CustomValidation:
 
 # user route's functions starts
 
-# assign the role of any user [ bank user / bank admin ]
 def role_assign(user_id):
+    """
+        assign the role of any user [ bank user / bank admin ]
+    """
     user_role = UserType(user_id=user_id, user_role='user')
     db.session.add(user_role)
     db.session.commit()
 
 
-# After applying for loan add the type of loan to loantype table with loan id data
 def add_loan_type(loan_type, loan_id):
+    """
+        After applying for loan add the type of loan to loantype table with loan id data
+    """
     loan_type = str(loan_type)
     loan = LoanType(loan_id=loan_id, loan_type=loan_type)
     db.session.add(loan)
     db.session.commit()
 
-# add type of insurance after applying for the insurance
 def insurance_type(insurance_type_):
+    """
+        Add type of insurance after applying for the insurance
+    """
     insurance = Insurance.query.filter_by(user_id=current_user.user_id).first()
     insurance_type = InsuranceType(insurance_id=insurance.insurance_id, insurance_type=insurance_type_)
     db.session.add(insurance_type)
@@ -82,6 +99,9 @@ def insurance_type(insurance_type_):
 
 
 def add_transaction_type(transaction_type, transaction_id):
+    """
+        add type of transaction after Transaction of money
+    """
     find_type = TransactionType.query.filter_by(transaction_id=transaction_id).first()
     if find_type:
         pass
