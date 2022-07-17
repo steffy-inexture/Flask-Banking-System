@@ -714,3 +714,7 @@ def bank_statement_pdf():
     response.headers["Content-Type"] = "application/pdf"
     response.headers["Content-Disposition"] = "attachment;filename=bank_statement.pdf"
     return response
+
+
+def add(a, b):
+    return a + b

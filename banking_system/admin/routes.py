@@ -1,16 +1,15 @@
-from flask import render_template, url_for, flash, redirect, request, jsonify
+from flask import render_template, url_for, flash, redirect, request, jsonify,Blueprint
 from flask_login import login_user, login_required
 from banking_system import db, bcrypt
-from banking_system.admin.constants import ADMIN_LOGIN_SUCCESS, FLASH_MESSAGES, ADMIN_LOGIN_UNSUCCESS, USER_DELETED, \
-    BRANCH_EXISTED, BRANCH_ADDED, ATM_EXISTED, ATM_ADDED, BANK_MEMBER_DELETED, BANK_MEMBER_ADDED, \
-    STATUS_UPDATE, ROLE_ALREADY_EXIST, NEW_ROLE_ADDED, LOAN_CHOICE_ALREADY_EXIST, NEW_LOAN_CHOICE_ADDED, \
-    INSURANCE_CHOICE_ALREADY_EXIST, NEW_INSURANCE_CHOICE_ADDED
 from banking_system.admin.utils import authentication_req, add_loan_money_to_user, save_picture_about
 from banking_system.models import Atm, User, Branch, BankDetails, Account, Loan, LoanType, Insurance, InsuranceType, \
     FixedDeposit, BankMember, MemberRole, LoanDetails, InsuranceDetails
 from banking_system.admin.forms import AddBranch, LoginForm, AddAtm, UserAccountStatus, LoanApprovalStatus, \
     InsuranceApprovalForm, BankMemberData, UpdateFdStatus, AddMemberRole, LoanChoice, InsuranceChoice
-from flask import Blueprint
+from banking_system.admin.constants import ADMIN_LOGIN_SUCCESS, FLASH_MESSAGES, ADMIN_LOGIN_UNSUCCESS, USER_DELETED, \
+    BRANCH_EXISTED, BRANCH_ADDED, ATM_EXISTED, ATM_ADDED, BANK_MEMBER_DELETED, BANK_MEMBER_ADDED, \
+    STATUS_UPDATE, ROLE_ALREADY_EXIST, NEW_ROLE_ADDED, LOAN_CHOICE_ALREADY_EXIST, NEW_LOAN_CHOICE_ADDED, \
+    INSURANCE_CHOICE_ALREADY_EXIST, NEW_INSURANCE_CHOICE_ADDED, NO_RECORD_ACTIVITY, NO_USER_FOUND, NOT_VALID_PICTURE
 
 admin = Blueprint('admin', __name__)
 
@@ -178,10 +177,10 @@ def loan_approval(user_id):
                 form.loan_type.data = loan_type.loan_type
                 form.loan_status.data = loan.loan_status
         else:
-            flash("No loan records found for this user", 'danger')
+            flash(NO_RECORD_ACTIVITY.format(activity='Loan'), FLASH_MESSAGES['FAIL'])
             return redirect(url_for('admin.admin_dashboard'))
     else:
-        flash("No user found in this user id", "danger")
+        flash(NO_USER_FOUND.format(id=user_id), FLASH_MESSAGES['FAIL'])
         return redirect(url_for('admin.admin_dashboard'))
 
     return render_template(
@@ -241,10 +240,10 @@ def insurance_approval(user_id):
                 form.insurance_type.data = insurance.insurance_type
                 form.insurance_status.data = insurance.insurance_status
         else:
-            flash("No insurance data for this user: ", 'danger')
+            flash(NO_RECORD_ACTIVITY.format(activity='Insurance'), FLASH_MESSAGES['FAIL'])
             return redirect(url_for('admin.admin_dashboard'))
     else:
-        flash("No user found for this user id", 'danger')
+        flash(NO_USER_FOUND.format(id=user_id), FLASH_MESSAGES['FAIL'])
         return redirect(url_for('admin.admin_dashboard'))
 
     return render_template(
@@ -304,13 +303,13 @@ def update_fd_status(user_id):
                     form.fd_id.data = fd.fd_id
                     form.fd_amount.data = fd.fd_amount
             else:
-                flash("this user has no fd data", "danger")
+                flash(NO_RECORD_ACTIVITY.format(activity='Fixed deposit'), FLASH_MESSAGES['FAIL'])
                 return redirect(url_for('admin.admin_dashboard'))
         else:
-            flash("This user has no account create one first", "danger")
+            flash(NO_RECORD_ACTIVITY.format(activity='Account'), FLASH_MESSAGES['FAIL'])
             return redirect(url_for('admin.admin_dashboard'))
     else:
-        flash("No user found for this user id", 'danger')
+        flash(NO_USER_FOUND.format(id=user_id), FLASH_MESSAGES['FAIL'])
         return redirect(url_for('admin.admin_dashboard'))
 
     return render_template(
@@ -360,10 +359,10 @@ def account_status(user_id):
                 form.user_name.data = user.user_name
                 form.account_number.data = account.account_number
         else:
-            flash("This user has no account", "danger")
+            flash(NO_RECORD_ACTIVITY.format(activity='Account'), FLASH_MESSAGES['FAIL'])
             return redirect(url_for('admin.admin_dashboard'))
     else:
-        flash("User is not found associated with this user id", "danger")
+        flash(NO_USER_FOUND.format(id=user_id), FLASH_MESSAGES['FAIL'])
         return redirect(url_for('admin.admin_dashboard'))
 
     return render_template('user_account_status.html',
@@ -473,7 +472,7 @@ def bank_about_member():
             flash(BANK_MEMBER_ADDED, FLASH_MESSAGES['SUCCESS'])
             return redirect(url_for('admin.admin_dashboard'))
         else:
-            flash("Photo is not valid", "danger")
+            flash(NOT_VALID_PICTURE, FLASH_MESSAGES['FAIL'])
             return redirect(url_for('admin.admin_dashboard'))
     elif request.method == 'GET':
         form.bank_member_position.choices = [i.member_role for i in MemberRole.query.all()]

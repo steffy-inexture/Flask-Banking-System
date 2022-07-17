@@ -15,6 +15,9 @@ LOAN_CHOICE_ALREADY_EXIST = "This loan choice is already exist"
 NEW_LOAN_CHOICE_ADDED = "New loan Choice has been added"
 INSURANCE_CHOICE_ALREADY_EXIST = "This insurance is already exist"
 NEW_INSURANCE_CHOICE_ADDED = "New insurance detail has been added"
+NO_RECORD_ACTIVITY = "No {activity} records found for this user"
+NO_USER_FOUND = "No user found in this user id {id}"
+NOT_VALID_PICTURE = "Photo is not valid"
 
 FLASH_MESSAGES = {
     'SUCCESS': 'success',
