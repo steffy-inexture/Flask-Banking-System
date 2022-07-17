@@ -1,4 +1,4 @@
-from flask import render_template, url_for, flash, redirect, request, jsonify,Blueprint
+from flask import render_template, url_for, flash, redirect, request, jsonify, Blueprint
 from flask_login import login_user, login_required
 from banking_system import db, bcrypt
 from banking_system.admin.utils import authentication_req, add_loan_money_to_user, save_picture_about
@@ -9,7 +9,8 @@ from banking_system.admin.forms import AddBranch, LoginForm, AddAtm, UserAccount
 from banking_system.admin.constants import ADMIN_LOGIN_SUCCESS, FLASH_MESSAGES, ADMIN_LOGIN_UNSUCCESS, USER_DELETED, \
     BRANCH_EXISTED, BRANCH_ADDED, ATM_EXISTED, ATM_ADDED, BANK_MEMBER_DELETED, BANK_MEMBER_ADDED, \
     STATUS_UPDATE, ROLE_ALREADY_EXIST, NEW_ROLE_ADDED, LOAN_CHOICE_ALREADY_EXIST, NEW_LOAN_CHOICE_ADDED, \
-    INSURANCE_CHOICE_ALREADY_EXIST, NEW_INSURANCE_CHOICE_ADDED, NO_RECORD_ACTIVITY, NO_USER_FOUND, NOT_VALID_PICTURE
+    INSURANCE_CHOICE_ALREADY_EXIST, NEW_INSURANCE_CHOICE_ADDED, NO_RECORD_ACTIVITY, NO_USER_FOUND, NOT_VALID_PICTURE, \
+    BRANCH_DELETED, BRANCH_IS_ASSOCIATED, ATM_DELETED
 
 admin = Blueprint('admin', __name__)
 
@@ -110,6 +111,30 @@ def admin_branch_data():
     return render_template('admin_branch_data.html', branchs=branchs)
 
 
+@admin.route("/admin/delete-branch-data/<branch_id>", methods=['GET', 'POST'])
+@login_required
+@authentication_req
+def delete_branch_data(branch_id):
+    """
+        for delete particular bank branch
+        if bank branch is associated / interlinked with any bank user then it will not delete
+        else bank branch delete successfully
+    """
+    accounts = Account.query.all()
+    branch_used = 0
+    for account in accounts:
+        if int(account.branch_id) == int(branch_id):
+            branch_used += 1
+    if branch_used == 0:
+        branch = Branch.query.filter_by(branch_id=branch_id).first()
+        db.session.delete(branch)
+        db.session.commit()
+        flash(BRANCH_DELETED, FLASH_MESSAGES['FAIL'])
+    else:
+        flash(BRANCH_IS_ASSOCIATED, FLASH_MESSAGES['FAIL'])
+    return redirect(url_for('admin.admin_branch_data'))
+
+
 @admin.route("/admin/all-atm-data/", methods=['GET', 'POST'])
 @login_required
 @authentication_req
@@ -125,6 +150,23 @@ def admin_atm_data():
     page = request.args.get('page', 1, type=int)
     atms = Atm.query.order_by(Atm.atm_id.desc()).paginate(page=page, per_page=5)
     return render_template('admin_atm_data.html', atms=atms)
+
+
+@admin.route("/admin/delete-atm-data/<atm_id>", methods=['GET', 'POST'])
+@login_required
+@authentication_req
+def delete_atm_data(atm_id):
+    """
+        for delete particular bank atm
+        if bank atm has the atm id then delete successfully
+        params: particular atm's atm id
+    """
+    atm = Atm.query.filter_by(atm_id=atm_id).first()
+    if atm:
+        db.session.delete(atm)
+        db.session.commit()
+        flash(ATM_DELETED, FLASH_MESSAGES['SUCCESS'])
+        return redirect(url_for('admin.admin_atm_data'))
 
 
 @admin.route("/admin/all-loan-data/", methods=['GET', 'POST'])

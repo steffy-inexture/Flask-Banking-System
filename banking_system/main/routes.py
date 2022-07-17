@@ -1,4 +1,4 @@
-from flask import render_template, request, Blueprint
+from flask import render_template
 from flask import Blueprint
 from banking_system.models import BankMember
 

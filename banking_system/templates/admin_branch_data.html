@@ -3,22 +3,27 @@
 <a href="{{url_for('admin.admin_dashboard')}}"><button>Go back</button></a>
 <br>
 <hr>
-<div class="col-md-4" style="text-align:center;border:solid;padding:15px;">
+<div class="col-md-8" style="text-align:center;border:solid;padding:15px;">
                 <h5 style="text-align: center;;background:black;color:white;">bank branch's Data</h5>
                 <table style="text-align:left">
                     <tr >
-                    <th style="text-align:left"><pre>id     </pre></th>&nbsp;
-                    <th style="text-align:left"><pre>Branch name   </pre></th>&nbsp;
-                    <th style="text-align:left"><pre>Branch address   </pre></th>
+                        <th style="text-align:left"><pre>id     </pre></th>&nbsp;
+                        <th style="text-align:left"><pre>Branch name   </pre></th>&nbsp;
+                        <th style="text-align:left"><pre>Branch address   </pre></th>
+                        <th style="text-align:left"><pre>Wanna delete   </pre></th>
                     </tr>
                     {% for branch in branchs.items %}
                     <tr>
                         <td><pre>{{branch.branch_id}}   </pre></td>&nbsp;
                         <td><pre>{{branch.branch_name}}    </pre></td>&nbsp;
-                        <td><pre>{{branch.branch_address}}   </pre></td>&nbsp;
+                        <td><pre>{{branch.branch_address}}   </pre></td>
+                        <td><a href="{{url_for('admin.delete_branch_data',branch_id=branch.branch_id)}}">
+                                    <button>Delete</button></a> </></td>&nbsp;
                     </tr>
                     {% endfor %}
                 </table>
+    <br>
+    <br>
                 {% for page_num in branchs.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2)  %}
                             {% if page_num %}
                                 {% if branchs.page == page_num %}

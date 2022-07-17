@@ -447,11 +447,16 @@ def add_fixed_deposit():
 
     if current_user.is_authenticated:
         account = Account.query.filter_by(user_id=current_user.user_id).first()
-        fixed_deposit = FixedDeposit(account_number=account.account_number)
-        db.session.add(fixed_deposit)
-        db.session.commit()
-        flash(SUCCESS_ACTIVITY.format(activity='FIXED DEPOSIT'), FLASH_MESSAGES['SUCCESS'])
-        return redirect(url_for('users.dashboard'))
+        is_already_fd_exist = FixedDeposit.query.filter_by(account_number=account.account_number).first()
+        if not is_already_fd_exist:
+            fixed_deposit = FixedDeposit(account_number=account.account_number)
+            db.session.add(fixed_deposit)
+            db.session.commit()
+            flash(SUCCESS_ACTIVITY.format(activity='FIXED DEPOSIT'), FLASH_MESSAGES['SUCCESS'])
+            return redirect(url_for('users.dashboard'))
+        else:
+            flash(PENDING_ACTIVITY.format(activity='FIXED DEPOSIT'), FLASH_MESSAGES['FAIL'])
+            return redirect(url_for('users.dashboard'))
     else:
         flash(LOGIN_FIRST, FLASH_MESSAGES['FAIL'])
         return redirect('main.home')
@@ -715,6 +720,6 @@ def bank_statement_pdf():
     response.headers["Content-Disposition"] = "attachment;filename=bank_statement.pdf"
     return response
 
-
+# for testing purpose
 def add(a, b):
     return a + b

@@ -15,6 +15,7 @@
             <th style="text-align:left">
                 <pre>atm address   </pre>
             </th>&nbsp;
+            <th style="text-align:left"><pre>Wanna delete   </pre></th>
         </tr>
         {% for atm in atms.items %}
         <tr>
@@ -24,6 +25,8 @@
             <td>
                 <pre>{{atm.atm_address}}   </pre>
             </td>&nbsp;
+            <td><a href="{{url_for('admin.delete_atm_data',atm_id=atm.atm_id)}}">
+                                    <button>Delete</button></a></td>&nbsp;
         </tr>
         {% endfor %}
     </table>
