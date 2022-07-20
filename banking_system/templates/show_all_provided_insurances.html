@@ -7,13 +7,17 @@
                 <h5 style="text-align: center;;background:black;color:white;">Bank provided Insurance Data</h5>
                 <table style="text-align:left">
                     <tr >
-                    <th style="text-align:left"><pre>id     </pre></th>&nbsp;
-                    <th style="text-align:left"><pre>member role name   </pre></th>&nbsp;
+                        <th style="text-align:left"><pre>Insurance id     </pre></th>&nbsp;
+                        <th style="text-align:left"><pre>Insurance name   </pre></th>&nbsp;
+                        <th style="text-align:left"><pre>Wanna Delete?   </pre></th>
                     </tr>
                     {% for insurance in insurances.items %}
                     <tr>
                         <td><pre>{{insurance.id}}   </pre></td>&nbsp;
                         <td><pre>{{insurance.insurance_name}}   </pre></td>&nbsp;
+                         <td><a href="{{url_for('admin.delete_insurance_choices',choice_id=insurance.id)}}">
+                                    <button>Delete</button></a> </></td>&nbsp;
+
                     </tr>
                     {% endfor %}
                 </table>

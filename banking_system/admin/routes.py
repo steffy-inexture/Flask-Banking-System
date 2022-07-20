@@ -10,7 +10,8 @@ from banking_system.admin.constants import ADMIN_LOGIN_SUCCESS, FLASH_MESSAGES, 
     BRANCH_EXISTED, BRANCH_ADDED, ATM_EXISTED, ATM_ADDED, BANK_MEMBER_DELETED, BANK_MEMBER_ADDED, \
     STATUS_UPDATE, ROLE_ALREADY_EXIST, NEW_ROLE_ADDED, LOAN_CHOICE_ALREADY_EXIST, NEW_LOAN_CHOICE_ADDED, \
     INSURANCE_CHOICE_ALREADY_EXIST, NEW_INSURANCE_CHOICE_ADDED, NO_RECORD_ACTIVITY, NO_USER_FOUND, NOT_VALID_PICTURE, \
-    BRANCH_DELETED, BRANCH_IS_ASSOCIATED, ATM_DELETED
+    BRANCH_DELETED, BRANCH_IS_ASSOCIATED, ATM_DELETED, ROLE_DELETED, ROLE_IS_OCCUPIED, LOAN_CHOICE_DELETED, \
+    LOAN_CHOICE_IS_OCCUPIED, INSURANCE_CHOICE_DELETED, INSURANCE_CHOICE_IS_OCCUPIED
 
 admin = Blueprint('admin', __name__)
 
@@ -548,7 +549,37 @@ def show_member_role_list():
 
     page = request.args.get('page', 1, type=int)
     roles = MemberRole.query.paginate(page=page, per_page=3)
-    return render_template('show_all_member_role.html', roles=roles)
+    return render_template('member_role_data.html', roles=roles)
+
+
+@admin.route("/admin/delete_member_role_from_list/<id>", methods=['GET', 'POST'])
+@login_required
+@authentication_req
+def delete_member_role_list(id):
+    """
+        delete_member_role_list deletes the particular role from Member role list
+        if role is occupied by some bank member then it'll not delete
+        else deletes the role successfully
+    """
+    member_position_id = []
+    member_role_id = []
+    for role in MemberRole.query.all():
+        member_role_id.append(int(role.id))
+        for member_data in BankMember.query.all():
+            if role.member_role == member_data.bank_member_position:
+                member_position_id.append(int(role.id))
+    role_is_occupied = 0
+    if int(id) in member_role_id:
+        if int(id) in member_position_id:
+            role_is_occupied += 1
+
+    if role_is_occupied == 0:
+        MemberRole.query.filter_by(id=id).delete()
+        db.session.commit()
+        flash(ROLE_DELETED, FLASH_MESSAGES['SUCCESS'])
+    else:
+        flash(ROLE_IS_OCCUPIED, FLASH_MESSAGES['FAIL'])
+    return redirect(url_for('admin.show_member_role_list'))
 
 
 @admin.route("/admin/show_loan_choices/", methods=['GET', 'POST'])
@@ -626,6 +657,43 @@ def loan_choices():
 
     return render_template('add_loan_choice_list.html', title='add-loan-choice-list', form=form)
 
+
+@admin.route("/admin/delete-loan-options/<int:choice_id>", methods=['GET', 'POST'])
+@login_required
+@authentication_req
+def delete_loan_choices(choice_id):
+    selected_loan_choice = LoanDetails.query.filter_by(id=choice_id).first()
+    used_this_loan = 0
+    for loans in LoanType.query.all():
+        if loans.loan_type == selected_loan_choice.loan_name:
+            used_this_loan += 1
+
+    if used_this_loan == 0:
+        LoanDetails.query.filter_by(id=choice_id).delete()
+        db.session.commit()
+        flash(LOAN_CHOICE_DELETED, FLASH_MESSAGES['SUCCESS'])
+    else:
+        flash(LOAN_CHOICE_IS_OCCUPIED, FLASH_MESSAGES['FAIL'])
+    return redirect(url_for('admin.show_loan_choices'))
+
+
+@admin.route("/admin/delete-insurance-options/<int:choice_id>", methods=['GET', 'POST'])
+@login_required
+@authentication_req
+def delete_insurance_choices(choice_id):
+    selected_insurance_choice = InsuranceDetails.query.filter_by(id=choice_id).first()
+    used_this_insurance = 0
+    for insurance in InsuranceType.query.all():
+        if insurance.insurance_type == selected_insurance_choice.insurance_name:
+            used_this_insurance += 1
+
+    if used_this_insurance == 0:
+        InsuranceDetails.query.filter_by(id=choice_id).delete()
+        db.session.commit()
+        flash(INSURANCE_CHOICE_DELETED, FLASH_MESSAGES['SUCCESS'])
+    else:
+        flash(INSURANCE_CHOICE_IS_OCCUPIED, FLASH_MESSAGES['FAIL'])
+    return redirect(url_for('admin.show_insurance_choices'))
 
 @admin.route("/admin/add-insurance-options/", methods=['GET', 'POST'])
 @login_required

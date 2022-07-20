@@ -90,7 +90,12 @@ def account_creation(user_id):
         account_number = account[0] + 1
     else:
         account_number = 1000000
-    account = Account(account_number=account_number, user_id=user.user_id, branch_id=branch_id, account_balance=5000)
+    account = Account(
+        account_number=account_number,
+        user_id=user.user_id,
+        branch_id=branch_id,
+        account_balance=5000
+    )
     db.session.add(account)
     db.session.commit()
 
@@ -127,7 +132,12 @@ def change_branch():
         form.user_name.data = user.user_name
         form.account_number.data = account.account_number
         form.myField.choices = [i.branch_name for i in Branch.query.all()]
-    return render_template('change_branch.html', user=user, account=account, branches=branches, form=form)
+    return render_template(
+        'change_branch.html',
+        user=user, account=account,
+        branches=branches,
+        form=form
+    )
 
 
 @users.route("/login", methods=['GET', 'POST'])
@@ -156,7 +166,11 @@ def login():
                     return redirect(url_for('users.dashboard'))
                 else:
                     flash(UNSUCCESSFUL_LOGIN, FLASH_MESSAGES['FAIL'])
-    return render_template('login.html', title='login', form=form)
+    return render_template(
+        'login.html',
+        title='login',
+        form=form
+    )
 
 
 @users.route("/user-dashboard", methods=['GET', 'POST'])
@@ -188,7 +202,8 @@ def dashboard():
             insurance=insurance,
             fixed_deposit=fixed_deposit,
             transaction=transaction,
-            transaction_type=transaction_type)
+            transaction_type=transaction_type
+        )
 
 
 @users.route("/user/logout")
@@ -314,8 +329,13 @@ def request_card():
                 card_pin = random.randint(1111, 9999)
                 expiry_date = datetime.datetime(2026, 7, 19, 12, 0, 0)
                 account_number = account.account_number
-                card = Card(card_number=card_number, cvv_number=cvv_number, card_pin=card_pin, expiry_date=expiry_date,
-                            account_number=account_number)
+                card = Card(
+                    card_number=card_number,
+                    cvv_number=cvv_number,
+                    card_pin=card_pin,
+                    expiry_date=expiry_date,
+                    account_number=account_number
+                )
                 db.session.add(card)
                 db.session.commit()
                 flash(CARD_CREATED, FLASH_MESSAGES['SUCCESS'])

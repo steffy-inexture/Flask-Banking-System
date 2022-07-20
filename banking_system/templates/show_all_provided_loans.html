@@ -7,13 +7,16 @@
                 <h5 style="text-align: center;;background:black;color:white;">bank provided loans Data</h5>
                 <table style="text-align:left">
                     <tr >
-                    <th style="text-align:left"><pre>id     </pre></th>&nbsp;
-                    <th style="text-align:left"><pre>Loan name   </pre></th>&nbsp;
+                        <th style="text-align:left"><pre>id     </pre></th>&nbsp;
+                        <th style="text-align:left"><pre>Loan name   </pre></th>&nbsp;
+                        <th style="text-align:left"><pre>Delete   </pre></th>
                     </tr>
                     {% for loan in loans.items %}
                     <tr>
                         <td><pre>{{loan.id}}   </pre></td>&nbsp;
                         <td><pre>{{loan.loan_name}}   </pre></td>&nbsp;
+                        <td><a href="{{url_for('admin.delete_loan_choices',choice_id=loan.id)}}">
+                                    <button>Delete</button></a> </></td>&nbsp;
                     </tr>
                     {% endfor %}
                 </table>

@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block content %}
+<a href="{{url_for('admin.admin_dashboard')}}">
+    <button>Go back</button>
+</a>
+<br>
+<hr>
+<div class="col-md-8" style="text-align:center;border:solid;padding:15px;">
+    <h5 style="text-align: center;;background:black;color:white;">bank branch's Data</h5>
+    <table style="text-align:left">
+        <tr>
+            <th style="text-align:left">
+                <pre>id     </pre>
+            </th>&nbsp;
+            <th style="text-align:left">
+                <pre>member role name   </pre>
+            </th>&nbsp;
+            <th style="text-align:left">
+                <pre>Wanna delete   </pre>
+            </th>
+        </tr>
+        {% for role in roles.items %}
+        <tr>
+            <td>
+                <pre>{{role.id}}  </pre>
+            </td>&nbsp;
+            <td>
+                <pre>{{role.member_role}}   </pre>
+            </td>&nbsp;
+            <td><a href="{{url_for('admin.delete_member_role_list',id=role.id)}}">
+                <button>Delete</button>
+            </a></
+            ></td>&nbsp;
+        </tr>
+        {% endfor %}
+    </table>
+    <br>
+    <br>
+    {% for page_num in roles.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+    {% if page_num %}
+    {% if roles.page == page_num %}
+    <a href="{{ url_for('admin.show_member_role_list', page=page_num)}}">
+        <button>{{page_num}}</button>
+    </a>
+    {% else %}
+
+    <a href="{{ url_for('admin.show_member_role_list', page=page_num)}}">
+        <button>{{page_num}}</button>
+    </a>
+    {% endif %}
+    {% else %}
+    ...
+    {% endif %}
+
+    {% endfor %}
+    <hr>
+    <a href="{{url_for('admin.member_role_list')}}">
+        <button>Add new member role</button>
+    </a>
+</div>
+{% endblock content %}
