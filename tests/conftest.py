@@ -1,6 +1,4 @@
 import pytest
-from sqlalchemy.orm import relationship
-
 from banking_system import db, create_app
 from banking_system.models import BankDetails, Branch, LoanDetails, InsuranceDetails, MemberRole, User, UserType, \
     Account, AccountType, Card, Transaction, TransactionType, Loan, LoanType, Insurance, InsuranceType, FixedDeposit, \
@@ -52,24 +50,24 @@ def app():
 
         user1 = User(
             user_id=1,
-            user_name='testuser1',
-            user_password='testuser1@123',
+            user_name='steffy',
+            user_password='steffy@123',
             user_email='steffy.jk2018@gmail.com',
             u_p=1234567898,
-            user_first_name='testuser1',
-            user_last_name='testuser1',
+            user_first_name='steffy',
+            user_last_name='jk',
             user_address='407,NYC',
             user_age=21,
             date_of_birth=datetime.utcnow()
         )
         user2 = User(
             user_id=2,
-            user_name='testuser2',
-            user_password='testuser2@123',
+            user_name='stella',
+            user_password='stella@123',
             user_email='stella.jk2018@gmail.com',
             u_p=1234567898,
-            user_first_name='testuser2',
-            user_last_name='testuser2',
+            user_first_name='stella',
+            user_last_name='jk',
             user_address='407,NYC',
             user_age=21,
             date_of_birth=datetime.utcnow()
@@ -89,11 +87,33 @@ def app():
             account_balance=5000,
             saving_balance=0,
             account_creation_date=datetime.utcnow(),
-            user_id=user1.user_id,
+            user_id=1,
             branch_id=1
         )
         db.session.add(account_user1)
+
+        account_user2 = Account(
+            account_number=1000001,
+            account_status='Active',
+            account_balance=5000,
+            saving_balance=0,
+            account_creation_date=datetime.utcnow(),
+            user_id=2,
+            branch_id=1
+        )
+        db.session.add(account_user2)
         db.session.commit()
+
+        card1 = Card(card_number=1, cvv_number=1234, card_pin=1234, creation_date=datetime.utcnow(),
+                     expiry_date=datetime.utcnow(), account_number=1000000)
+
+        db.session.add(card1)
+
+        loan1 = Loan(loan_id=1, loan_amount=5000, loan_status='Active', rate_interest=5.6,
+                     paid_amount=0, user_id=1)
+        db.session.add(loan1)
+        db.session.commit()
+
     yield app
 
 
@@ -300,20 +320,24 @@ def new_member_role():
     )
     return role
 
+
 @pytest.fixture()
 def new_loan_detail():
     loan_detail = LoanDetails(id=1, loan_name='home loan')
-    return  loan_detail
+    return loan_detail
+
 
 @pytest.fixture()
 def new_insurance_detail():
     insurance_detail = InsuranceDetails(id=1, insurance_name='home loan')
-    return  insurance_detail
+    return insurance_detail
+
 
 @pytest.fixture()
 def otp_by_mail():
-    otp = OtpByMail(id=1, email='home@gmail.com',otp=1234)
-    return  otp
+    otp = OtpByMail(id=1, email='home@gmail.com', otp=1234)
+    return otp
+
 
 # ---------------testing for models.py end here-------------------------------------------------
 # ------------------------------------------------------
@@ -325,8 +349,38 @@ def login(client):
         "/login",
         data=dict(
             user_id=1,
-            user_email='testuser1@gmail.com',
-            user_password='testuser1@123',
+            user_email='steffy.jk2018@gmail.com',
+            user_password='steffy@123',
+            remember='y'),
+        follow_redirects=True
+    )
+    return response
+
+
+@pytest.fixture()
+def login2(client):
+    """Login helper function"""
+    response = client.post(
+        "/login",
+        data=dict(
+            user_id=2,
+            user_email='stella.jk2018@gmail.com',
+            user_password='stella@123',
+            remember='y'),
+        follow_redirects=True
+    )
+    return response
+
+
+@pytest.fixture()
+def login_fake(client):
+    """Login helper function"""
+    response = client.post(
+        "/login",
+        data=dict(
+            user_id=1,
+            user_email='stellak.jk2018@gmail.com',
+            user_password='steffy@123',
             remember='y'),
         follow_redirects=True
     )
@@ -339,6 +393,7 @@ def register(client):
     response = client.post(
         "/user/registration",
         data=dict(
+            user_id=7,
             user_name='steff',
             user_email='steff@gmail.com',
             user_phone_number=1234567894,
@@ -348,7 +403,8 @@ def register(client):
             user_age=21,
             date_of_birth=datetime.utcnow(),
             user_password='steff@123',
-            confirm_password='steff@123'),
+            confirm_password='steff@123',
+        ),
         follow_redirects=True)
     return response
 

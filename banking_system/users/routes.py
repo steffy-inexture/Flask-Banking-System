@@ -41,6 +41,8 @@ def register():
     form = RegistrationForm()
     if form.validate_on_submit():
         user_name = form.user_name.data,
+        # hashed_password = bcrypt.generate_password_hash(form.user_password.data).decode('utf-8')
+        # user_password = hashed_password
         user_password = form.user_password.data,
         user_email = form.user_email.data,
         user_phone_number = form.user_phone_number.data,
@@ -154,18 +156,21 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         user = User.query.filter_by(user_email=form.user_email.data).first()
-        account = Account.query.filter_by(user_id=user.user_id).first()
-        if account:
-            if account.account_status == 'Inactive':
-                flash(ADMIN_NOT_ACTIVATE_UR_ACCOUNT, FLASH_MESSAGES['FAIL'])
-                return redirect(url_for('users.login'))
-            elif account.account_status == 'Active':
-                if user is not None and form.user_password.data == user.user_password:
-                    login_user(user, remember=form.remember.data)
-                    flash(SUCCESSFUL_LOGIN, FLASH_MESSAGES['SUCCESS'])
-                    return redirect(url_for('users.dashboard'))
-                else:
-                    flash(UNSUCCESSFUL_LOGIN, FLASH_MESSAGES['FAIL'])
+        if user:
+            account = Account.query.filter_by(user_id=user.user_id).first()
+            if account:
+                if account.account_status == 'Inactive':
+                    flash(ADMIN_NOT_ACTIVATE_UR_ACCOUNT, FLASH_MESSAGES['FAIL'])
+                    return redirect(url_for('users.login'))
+                elif account.account_status == 'Active':
+                    if user is not None and form.user_password.data == user.user_password:
+                        login_user(user, remember=form.remember.data)
+                        flash(SUCCESSFUL_LOGIN, FLASH_MESSAGES['SUCCESS'])
+                        return redirect(url_for('users.dashboard'))
+                    else:
+                        flash(UNSUCCESSFUL_LOGIN, FLASH_MESSAGES['FAIL'])
+        else:
+            flash(UNSUCCESSFUL_LOGIN, FLASH_MESSAGES['FAIL'])
     return render_template(
         'login.html',
         title='login',
