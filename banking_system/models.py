@@ -118,10 +118,6 @@ class Transaction(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.user_id', ondelete='CASCADE'), nullable=False)
     transaction_type = relationship("TransactionType", cascade="all, delete")
 
-    def save(self):
-        db.session.add(self)
-        return db.session.commit()
-
 
 class TransactionType(db.Model):
     """

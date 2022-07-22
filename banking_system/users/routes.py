@@ -424,7 +424,7 @@ def request_insurance():
     if form.validate_on_submit():
         insurance = Insurance.query.filter_by(user_id=user.user_id).first()
         if insurance:
-            flash(PENDING_ACTIVITY.format(activity='LOAN'), FLASH_MESSAGES['FAIL'])
+            flash(PENDING_ACTIVITY.format(activity='Insurance'), FLASH_MESSAGES['FAIL'])
             return redirect(url_for('users.dashboard'))
         else:
             insurance_amount = form.insurance_amount_choices.data

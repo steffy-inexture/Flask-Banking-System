@@ -1,4 +1,6 @@
 import pytest
+from flask import template_rendered
+
 from banking_system import db, create_app
 from banking_system.models import BankDetails, Branch, LoanDetails, InsuranceDetails, MemberRole, User, UserType, \
     Account, AccountType, Card, Transaction, TransactionType, Loan, LoanType, Insurance, InsuranceType, FixedDeposit, \
@@ -49,36 +51,49 @@ def app():
         db.session.add(bank_member_choice)
 
         user1 = User(
-            user_id=1,
-            user_name='steffy',
-            user_password='steffy@123',
-            user_email='steffy.jk2018@gmail.com',
-            u_p=1234567898,
-            user_first_name='steffy',
-            user_last_name='jk',
-            user_address='407,NYC',
-            user_age=21,
+            user_id=1, user_name='steffy',user_password='steffy@123',
+            user_email='steffy.jk2018@gmail.com',u_p=1234567898,user_first_name='steffy',
+            user_last_name='jk',user_address='407,NYC',user_age=21,
             date_of_birth=datetime.utcnow()
         )
+
         user2 = User(
-            user_id=2,
-            user_name='stella',
-            user_password='stella@123',
-            user_email='stella.jk2018@gmail.com',
-            u_p=1234567898,
-            user_first_name='stella',
-            user_last_name='jk',
-            user_address='407,NYC',
-            user_age=21,
+            user_id=2,user_name='stella',user_password='stella@123',
+            user_email='stella.jk2018@gmail.com',u_p=1234567898,user_first_name='stella',
+            user_last_name='jk',user_address='407,NYC',user_age=21,
             date_of_birth=datetime.utcnow()
         )
+
+        inactive_user = User(
+            user_id=5, user_name='inactive', user_password='inactive@123',
+            user_email='inactive.jk2018@gmail.com', u_p=1234567898, user_first_name='inactive',
+            user_last_name='jk', user_address='407,NYC', user_age=21,
+            date_of_birth=datetime.utcnow()
+        )
+
+        admin = User(
+            user_id=3, user_name='admin', user_password='admin@123',
+            user_email='steffy.inexture@gmail.com', u_p=1234567898, user_first_name='admin',
+            user_last_name='jk', user_address='407,NYC', user_age=21,
+            date_of_birth=datetime.utcnow()
+        )
+
         db.session.add(user1)
         db.session.add(user2)
+        db.session.add(admin)
+        db.session.add(inactive_user)
         db.session.commit()
 
         user_type1 = UserType(user_id=user1.user_id,
-                              user_role='a')
+                              user_role='user')
+        admin_type = UserType(user_id=admin.user_id,
+                              user_role='admin')
+
+        inactive_type = UserType(user_id=inactive_user.user_id,
+                              user_role='user')
         db.session.add(user_type1)
+        db.session.add(admin_type)
+        db.session.add(inactive_type)
         db.session.commit()
 
         account_user1 = Account(
@@ -101,7 +116,17 @@ def app():
             user_id=2,
             branch_id=1
         )
+        inactive_acc = Account(
+            account_number=1000005,
+            account_status='Inactive',
+            account_balance=5000,
+            saving_balance=0,
+            account_creation_date=datetime.utcnow(),
+            user_id=5,
+            branch_id=1
+        )
         db.session.add(account_user2)
+        db.session.add(inactive_acc)
         db.session.commit()
 
         card1 = Card(card_number=1, cvv_number=1234, card_pin=1234, creation_date=datetime.utcnow(),
@@ -111,7 +136,9 @@ def app():
 
         loan1 = Loan(loan_id=1, loan_amount=5000, loan_status='Active', rate_interest=5.6,
                      paid_amount=0, user_id=1)
+        insurance1 = Insurance(insurance_id=1, insurance_amount=5000, insurance_status='Active', user_id=1)
         db.session.add(loan1)
+        db.session.add(insurance1)
         db.session.commit()
 
     yield app
@@ -126,6 +153,18 @@ def client(app):
 def runner(app):
     return app.test_cli_runner()
 
+@pytest.fixture
+def captured_templates(app):
+    recorded = []
+
+    def record(sender, template, context, **extra):
+        recorded.append((template, context))
+
+    template_rendered.connect(record, app)
+    try:
+        yield recorded
+    finally:
+        template_rendered.disconnect(record, app)
 
 # ---------------test model.py's model start----------------------------------
 @pytest.fixture()
@@ -228,6 +267,16 @@ def new_loan_type():
     )
 
     return loan_type
+
+
+@pytest.fixture()
+def branch_data(app):
+    data = Branch(
+        branch_name='Iskon',
+        branch_address='3,ahemdabad',
+        bank_id=1,
+    )
+    return data
 
 
 @pytest.fixture()
@@ -349,8 +398,24 @@ def login(client):
         "/login",
         data=dict(
             user_id=1,
+            user_name='steffy',
             user_email='steffy.jk2018@gmail.com',
             user_password='steffy@123',
+            remember='y'),
+        follow_redirects=True
+    )
+    return response
+
+@pytest.fixture()
+def admin_login(client):
+    """admin Login helper function"""
+    response = client.post(
+        "/admin_login/",
+        data=dict(
+            user_id=3,
+            user_name='admin',
+            user_email='steffy.inexture@gmail.com',
+            user_password='admin@123',
             remember='y'),
         follow_redirects=True
     )
@@ -372,6 +437,8 @@ def login2(client):
     return response
 
 
+
+
 @pytest.fixture()
 def login_fake(client):
     """Login helper function"""
@@ -381,6 +448,20 @@ def login_fake(client):
             user_id=1,
             user_email='stellak.jk2018@gmail.com',
             user_password='steffy@123',
+            remember='y'),
+        follow_redirects=True
+    )
+    return response
+
+@pytest.fixture()
+def inactive_login(client):
+    """Login helper function"""
+    response = client.post(
+        "/login",
+        data=dict(
+            user_id=1,
+            user_email='inactive.jk2018@gmail.com',
+            user_password='inactive@123',
             remember='y'),
         follow_redirects=True
     )
