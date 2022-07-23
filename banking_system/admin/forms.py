@@ -66,9 +66,9 @@ class UpdateFdStatus(FlaskForm):
     """
     user_id = StringField('User_id', validators=[DataRequired()], render_kw={'readonly': True})
     user_name = StringField('User name', validators=[DataRequired()], render_kw={'readonly': True})
-    fd_id = StringField('User name', validators=[DataRequired()], render_kw={'readonly': True})
-    fd_amount = StringField('User name', validators=[DataRequired()], render_kw={'readonly': True})
-    fd_status = RadioField('Member Position', choices=[('Inactive', 'Inactive'), ('Active', 'Active')])
+    fd_id = StringField('Fd id', validators=[DataRequired()], render_kw={'readonly': True})
+    fd_amount = StringField('Fd amount', validators=[DataRequired()], render_kw={'readonly': True})
+    fd_status = RadioField('Fd status', choices=[('Inactive', 'Inactive'), ('Active', 'Active')])
     submit = SubmitField('Update the Fd detail')
 
 

@@ -11,7 +11,7 @@ def test_new_user(new_user):
 
 def test_new_user_type(new_user_type):
     assert new_user_type.user_id == 1
-    assert new_user_type.user_role == 'admin'
+    assert new_user_type.user_role == 'user'
 
 
 def test_new_account(new_account):
@@ -23,7 +23,7 @@ def test_new_account(new_account):
 def test_new_account_type(new_account_type):
     assert new_account_type.account_type_id == 1
     assert new_account_type.account_number == 1
-    assert new_account_type.account_type == 'Inactive'
+    assert new_account_type.account_type == 'Active'
 
 
 def test_new_card(new_card):
@@ -37,7 +37,7 @@ def test_new_transaction(new_transaction):
     assert new_transaction.transaction_id == 1
     assert new_transaction.transaction_amount == 1000
     assert new_transaction.sender_id == 1
-    assert new_transaction.receiver_id == 2
+    assert new_transaction.receiver_id == 1
     assert new_transaction.user_id == 1
 
 

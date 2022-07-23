@@ -1,23 +1,68 @@
 from datetime import datetime
 
-from flask import session
-from flask_login import current_user
-from wtforms import form
-
 
 def test_registration(client):
     response = client.post("/user/registration",
                            data=dict(
-                               user_id=7, user_name='sdfghjk', user_email='vacationsfever2021@gmail.com',
+                               user_name='sdfghjk', user_email='vacationsfever2021@gmail.com',
                                user_phone_number=1234567895, user_first_name='steff',
                                user_last_name='steffjk', user_address='407,NYC',
                                user_age=21, date_of_birth=datetime.utcnow(),
                                user_password='steff@123', confirm_password='steff@123',
-                               role_assign=True, account_creation=True
-                           ), follow_redirects=True
+                               submit="Sign Up")
+                           , follow_redirects=True
                            )
     assert response.status_code == 200
+
     # assert 'Your account has been created you are all set for login' in str(response.data)
+
+
+# check validation for duplication in user_name while registration
+def test_duplication_in_user_name_registration(client):
+    response = client.post("/user/registration",
+                           data=dict(
+                               user_name='steffy', user_email='vacationsfever2021@gmail.com',
+                               user_phone_number=1234567895, user_first_name='steff',
+                               user_last_name='steffjk', user_address='407,NYC',
+                               user_age=21, date_of_birth=datetime.utcnow(),
+                               user_password='steff@123', confirm_password='steff@123',
+                               submit="Sign Up")
+                           , follow_redirects=True
+                           )
+    assert response.status_code == 200
+    assert 'That username is taken please Choose different one' in str(response.data)
+
+
+# check validation for duplication in user_email while registration
+def test_duplication_in_user_email_registration(client):
+    response = client.post("/user/registration",
+                           data=dict(
+                               user_name='steffy', user_email='steffy.jk2018@gmail.com',
+                               user_phone_number=1234567895, user_first_name='steff',
+                               user_last_name='steffjk', user_address='407,NYC',
+                               user_age=21, date_of_birth=datetime.utcnow(),
+                               user_password='steff@123', confirm_password='steff@123',
+                               submit="Sign Up")
+                           , follow_redirects=True
+                           )
+    assert response.status_code == 200
+    assert 'That email is taken please Choose different one' in str(response.data)
+
+
+# check validation for user_email is actual exist or not while registration [pending]
+# def test_registration(client):
+#     response = client.post("/user/registration",
+#                            data=dict(
+#                                user_name='steffy', user_email='dfghjkgfcghjkljhgfxcv2018@gmail.com',
+#                                user_phone_number=1234567895, user_first_name='steff',
+#                                user_last_name='steffjk', user_address='407,NYC',
+#                                user_age=21, date_of_birth=datetime.utcnow(),
+#                                user_password='steff@123', confirm_password='steff@123',
+#                             submit="Sign Up")
+#                            , follow_redirects=True
+#                            )
+#     assert response.status_code == 200
+#     assert 'This email id is not exist' in str(response.data)
 
 
 # def test_registration_with_admin(client,admin_login):
@@ -233,7 +278,6 @@ def test_profile_post_data(client, login):
                           user_address='nyx', user_age=21, date_of_birth=19 - 7 - 2000,
                       ),
                       follow_redirects=True)
-    print("==========is is data: ", res.data)
     assert res.status_code == 200
     assert 'steff007' in str(res.data)
     assert '1234567895' in str(res.data)
@@ -293,3 +337,27 @@ def test_money_rec_account_exist(client, login):
                       follow_redirects=True)
     assert res.status_code == 200
     assert 'No account is exist in this number' in str(res.data)
+
+
+# check weather transfer amount > account balance for choice 1
+def test_user_money_form_data(client, login):
+    response = client.post("/user/transfer-money",
+                           data=dict(user_id=1, user_name='steffy', transfer_choice='1',
+                                     transfer_amount=5003, user_password='steffy@123', otp_btn=True,
+                                     ),
+                           follow_redirects=True)
+    assert response.status_code == 200
+    assert 'Insufficient balance' in str(response.data)
+
+# check weather saving balance < transfer balance for choice 2 [ pending ]
+# def test_saving_to_account_transfer_option(client, login):
+#     response = client.post("/user/transfer-money",
+#                            data=dict(user_id=1, user_name='steffy', transfer_choice='2',
+#                                      transfer_amount=5003, user_password='steffy@123', otp_btn=True,
+#                                      ),
+#                            follow_redirects=True)
+#     assert response.status_code == 200
+#     print("this is for savinng:::::::::",response.data)
+#     assert 'Insufficient balance' in str(response.data)
+
+

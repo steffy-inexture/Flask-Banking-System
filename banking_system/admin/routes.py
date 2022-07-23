@@ -112,7 +112,7 @@ def admin_branch_data():
     return render_template('admin_branch_data.html', branchs=branchs)
 
 
-@admin.route("/admin/delete-branch-data/<branch_id>", methods=['GET', 'POST'])
+@admin.route("/admin/delete-branch-data/<int:branch_id>", methods=['GET', 'POST'])
 @login_required
 @authentication_req
 def delete_branch_data(branch_id):
@@ -124,7 +124,7 @@ def delete_branch_data(branch_id):
     accounts = Account.query.all()
     branch_used = 0
     for account in accounts:
-        if int(account.branch_id) == int(branch_id):
+        if (account.branch_id) == (branch_id):
             branch_used += 1
     if branch_used == 0:
         branch = Branch.query.filter_by(branch_id=branch_id).first()
@@ -369,7 +369,7 @@ def delete_fd(user_id):
         Admin has the authority to delete the fixed deposits
     """
     user = User.query.filter_by(user_id=user_id).first()
-    flash(f"{user.user_name} this is the name", 'success')
+    flash(f"{user_id} this is the name", 'success')
     return redirect(url_for('admin.admin_user_fd_data'))
 
 

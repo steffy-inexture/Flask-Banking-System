@@ -40,7 +40,17 @@ def app():
             bank_id=1
         )
 
+        not_associate_bank_branch = Branch(
+            branch_id=2,
+            branch_name='not branch associated',
+            branch_address='dummy data',
+            bank_id=1
+        )
+        db.session.add(not_associate_bank_branch)
         db.session.add(branch_data)
+
+        atm = Atm(atm_id=1, atm_address='ahmedabad', bank_id=1)
+        db.session.add(atm)
         db.session.commit()
 
         loan_choice = LoanDetails(loan_name='test loan choice1')
@@ -51,16 +61,16 @@ def app():
         db.session.add(bank_member_choice)
 
         user1 = User(
-            user_id=1, user_name='steffy',user_password='steffy@123',
-            user_email='steffy.jk2018@gmail.com',u_p=1234567898,user_first_name='steffy',
-            user_last_name='jk',user_address='407,NYC',user_age=21,
+            user_id=1, user_name='steffy', user_password='steffy@123',
+            user_email='steffy.jk2018@gmail.com', u_p=1234567898, user_first_name='steffy',
+            user_last_name='jk', user_address='407,NYC', user_age=21,
             date_of_birth=datetime.utcnow()
         )
 
         user2 = User(
-            user_id=2,user_name='stella',user_password='stella@123',
-            user_email='stella.jk2018@gmail.com',u_p=1234567898,user_first_name='stella',
-            user_last_name='jk',user_address='407,NYC',user_age=21,
+            user_id=2, user_name='stella', user_password='stella@123',
+            user_email='stella.jk2018@gmail.com', u_p=1234567898, user_first_name='stella',
+            user_last_name='jk', user_address='407,NYC', user_age=21,
             date_of_birth=datetime.utcnow()
         )
 
@@ -90,7 +100,7 @@ def app():
                               user_role='admin')
 
         inactive_type = UserType(user_id=inactive_user.user_id,
-                              user_role='user')
+                                 user_role='user')
         db.session.add(user_type1)
         db.session.add(admin_type)
         db.session.add(inactive_type)
@@ -136,9 +146,17 @@ def app():
 
         loan1 = Loan(loan_id=1, loan_amount=5000, loan_status='Active', rate_interest=5.6,
                      paid_amount=0, user_id=1)
+        loan_type1 = LoanType(loan_type_id=1, loan_id=1, loan_type='personal loan')
         insurance1 = Insurance(insurance_id=1, insurance_amount=5000, insurance_status='Active', user_id=1)
+        insurance_type1 = InsuranceType(insurance_type_id=1, insurance_id=1, insurance_type='life insurance')
+        fd1 = FixedDeposit(fd_id=1, fd_amount=5000, fd_status='Active', rate_interest=5.6,
+                           fd_create_date=datetime.utcnow(), fd_duration=datetime.utcnow(),
+                           added_amount=0, account_number=1000000)
+        db.session.add(insurance_type1)
         db.session.add(loan1)
+        db.session.add(loan_type1)
         db.session.add(insurance1)
+        db.session.add(fd1)
         db.session.commit()
 
     yield app
@@ -152,19 +170,6 @@ def client(app):
 @pytest.fixture()
 def runner(app):
     return app.test_cli_runner()
-
-@pytest.fixture
-def captured_templates(app):
-    recorded = []
-
-    def record(sender, template, context, **extra):
-        recorded.append((template, context))
-
-    template_rendered.connect(record, app)
-    try:
-        yield recorded
-    finally:
-        template_rendered.disconnect(record, app)
 
 # ---------------test model.py's model start----------------------------------
 @pytest.fixture()
@@ -185,7 +190,7 @@ def new_user():
 
 @pytest.fixture()
 def new_user_type():
-    user_type = UserType(user_id=1, user_role='admin')
+    user_type = UserType(user_id=1, user_role='user')
     return user_type
 
 
@@ -204,7 +209,7 @@ def new_account_type():
     account_type = AccountType(
         account_type_id=1,
         account_number=1,
-        account_type='Inactive'
+        account_type='Active'
     )
     return account_type
 
@@ -228,7 +233,7 @@ def new_transaction():
         transaction_id=1,
         transaction_amount=1000,
         sender_id=1,
-        receiver_id=2,
+        receiver_id=1,
         transaction_date=datetime.utcnow(),
         user_id=1,
     )
@@ -406,6 +411,7 @@ def login(client):
     )
     return response
 
+
 @pytest.fixture()
 def admin_login(client):
     """admin Login helper function"""
@@ -437,8 +443,6 @@ def login2(client):
     return response
 
 
-
-
 @pytest.fixture()
 def login_fake(client):
     """Login helper function"""
@@ -452,6 +456,7 @@ def login_fake(client):
         follow_redirects=True
     )
     return response
+
 
 @pytest.fixture()
 def inactive_login(client):
@@ -467,26 +472,5 @@ def inactive_login(client):
     )
     return response
 
-
-@pytest.fixture()
-def register(client):
-    """register helper function"""
-    response = client.post(
-        "/user/registration",
-        data=dict(
-            user_id=7,
-            user_name='steff',
-            user_email='steff@gmail.com',
-            user_phone_number=1234567894,
-            user_first_name='steff',
-            user_last_name='steffjk',
-            user_address='407,NYC',
-            user_age=21,
-            date_of_birth=datetime.utcnow(),
-            user_password='steff@123',
-            confirm_password='steff@123',
-        ),
-        follow_redirects=True)
-    return response
 
 # ----------------------------------------------

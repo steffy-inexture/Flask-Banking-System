@@ -152,9 +152,7 @@ class AddMoney(FlaskForm):
 
     def validate_reciver_account(self, reciver_account):
         account = Account.query.filter_by(account_number=reciver_account.data).first()
-        if account:
-            pass
-        else:
+        if account is None:
             raise ValidationError('No account is exist in this number')
 
 
@@ -202,8 +200,6 @@ class TransferMoney(FlaskForm):
                 raise ValidationError('you have not requested for fd yet')
 
         elif transfer_choice.data == '2':
-            print(transfer_amount.data)
-            print(account.saving_balance)
             if transfer_amount.data > account.saving_balance:
                 raise ValidationError('Insufficient saving balance')
 

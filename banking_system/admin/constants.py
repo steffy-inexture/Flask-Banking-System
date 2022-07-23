@@ -5,13 +5,13 @@ USER_DELETED = 'User is been deleted from the user :)'
 BRANCH_EXISTED = 'This branch has already exist!'
 BRANCH_ADDED = 'Branch is added successfully'
 BRANCH_DELETED = 'Branch deleted Successfully'
-BRANCH_IS_ASSOCIATED = 'This branch is interlinked with some account so you can\'t delete this branch'
+BRANCH_IS_ASSOCIATED = 'This branch is interlinked with some account so you can not delete this branch'
 ATM_EXISTED = 'Atm has already exist at this area!'
 ATM_ADDED = 'Atm is added successfully'
 ATM_DELETED = 'Atm deleted successfully.'
 BANK_MEMBER_ADDED = 'New bank member has been created!'
 BANK_MEMBER_DELETED = 'Bank member has been deleted'
-STATUS_UPDATE = '{user_name}\'s {activity} status has been changed :)'
+STATUS_UPDATE = '{user_name}s {activity} status has been changed :)'
 ROLE_ALREADY_EXIST = "This role is already exist"
 NEW_ROLE_ADDED = "New role has been added"
 ROLE_DELETED = "Desired role deleted successfully"
@@ -27,6 +27,7 @@ INSURANCE_CHOICE_IS_OCCUPIED = "Insurance choice is occupied with some user you 
 NO_RECORD_ACTIVITY = "No {activity} records found for this user"
 NO_USER_FOUND = "No user found in this user id {id}"
 NOT_VALID_PICTURE = "Photo is not valid"
+FD_DELETED="FD DATA HAS BEEN DELTED"
 
 FLASH_MESSAGES = {
     'SUCCESS': 'success',
