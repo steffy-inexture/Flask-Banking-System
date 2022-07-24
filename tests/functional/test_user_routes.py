@@ -24,7 +24,7 @@ def test_duplication_in_user_name_registration(client):
                                user_name='steffy', user_email='vacationsfever2021@gmail.com',
                                user_phone_number=1234567895, user_first_name='steff',
                                user_last_name='steffjk', user_address='407,NYC',
-                               user_age=21, date_of_birth=datetime.utcnow(),
+                               user_age=21, date_of_birth="19-7-2000",
                                user_password='steff@123', confirm_password='steff@123',
                                submit="Sign Up")
                            , follow_redirects=True
@@ -89,6 +89,22 @@ def test_login(login):
     assert login.request.path == "/user-dashboard"
 
 
+# user tries to login but the account is not activated by admin
+def test_login_inactive_account(client):
+    res = client.post("/login", data=dict(user_email='inactive.jk2018@gmail.com',
+                                          user_password='inactive@123', remember="y"),
+                      follow_redirects=True)
+    assert 'Hey! admin does not activate your account yet! cant login rn' in str(res.data)
+
+
+# password is not correct so login unsuccessfully
+def test_login_unsuccessfull(client):
+    res = client.post("/login", data=dict(user_email='steffy.jk2018@gmail.com',
+                                          user_password='dfghj@123', remember="y"),
+                      follow_redirects=True)
+    assert 'Login unsuccessfully..please check email and password' in str(res.data)
+
+
 # test wrong login data
 def test_wrong_credentials(login_fake):
     assert 'Login unsuccessfully..please check email and password' in str(login_fake.data)
@@ -110,11 +126,12 @@ def test_dashboard(client, login):
     assert data.status_code == 200
 
 
-def test_profile_get(client):
-    response = client.get(
-        "/login",
+def test_profile_post(client):
+    response = client.post(
+        "/profile",
         data=dict(
-            user_name='steff',
+            user_id=1,
+            user_name='steffyjk',
             user_phone_number=1234567895,
             user_first_name='steff',
             user_last_name='jk',
@@ -126,7 +143,7 @@ def test_profile_get(client):
         follow_redirects=True
     )
     assert response.status_code == 200
-    assert response.request.path == "/login"
+    assert 'Your account has been update!' in str(response.data)
 
 
 def test_profile_post(client):
@@ -349,6 +366,7 @@ def test_user_money_form_data(client, login):
     assert response.status_code == 200
     assert 'Insufficient balance' in str(response.data)
 
+
 # check weather saving balance < transfer balance for choice 2 [ pending ]
 # def test_saving_to_account_transfer_option(client, login):
 #     response = client.post("/user/transfer-money",
@@ -360,4 +378,18 @@ def test_user_money_form_data(client, login):
 #     print("this is for savinng:::::::::",response.data)
 #     assert 'Insufficient balance' in str(response.data)
 
+# reset password info request
+def test_reset_req(client):
+    response = client.post("/reset_password",
+                           data=dict(user_email="steffy.jk2018@gmail.com"),
+                           follow_redirects=True)
+    assert 'An email has been sent with instruction to reset your password.' in str(response.data)
 
+def test_reset_req(client,login):
+    response = client.post("/reset_password",
+                           follow_redirects=True)
+    assert response.status_code == 200
+
+def test_bank_statement(client,login):
+    response = client.post("/user/bank-statement/",follow_redirects=True)
+    assert  response.status_code == 200

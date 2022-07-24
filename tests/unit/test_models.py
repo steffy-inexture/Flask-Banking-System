@@ -115,7 +115,7 @@ def test_new_member(new_bank_member):
 
 
 def test_new_member_role(new_member_role):
-    assert new_member_role.id == 1
+    assert new_member_role.id == 5
     assert new_member_role.member_role == 'bank user'
 
 

@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import pytest
 from flask import template_rendered
 
@@ -146,9 +148,9 @@ def app():
 
         loan1 = Loan(loan_id=1, loan_amount=5000, loan_status='Active', rate_interest=5.6,
                      paid_amount=0, user_id=1)
-        loan_type1 = LoanType(loan_type_id=1, loan_id=1, loan_type='personal loan')
+        loan_type1 = LoanType(loan_type_id=1, loan_id=1, loan_type='Home loan')
         insurance1 = Insurance(insurance_id=1, insurance_amount=5000, insurance_status='Active', user_id=1)
-        insurance_type1 = InsuranceType(insurance_type_id=1, insurance_id=1, insurance_type='life insurance')
+        insurance_type1 = InsuranceType(insurance_type_id=1, insurance_id=1, insurance_type='Life insurance')
         fd1 = FixedDeposit(fd_id=1, fd_amount=5000, fd_status='Active', rate_interest=5.6,
                            fd_create_date=datetime.utcnow(), fd_duration=datetime.utcnow(),
                            added_amount=0, account_number=1000000)
@@ -157,6 +159,32 @@ def app():
         db.session.add(loan_type1)
         db.session.add(insurance1)
         db.session.add(fd1)
+        db.session.commit()
+
+        role_for_member = MemberRole(id=7, member_role="CEO")
+        second_role = MemberRole(id=8, member_role="Bank manger")
+        db.session.add(role_for_member)
+        db.session.add(second_role)
+        db.session.commit()
+
+        # adding new bank member
+        resources = Path(__file__).parent / "resources"
+        member = BankMember(image_file="testprofile.jpg",
+                            bank_member_id=1, bank_member_name="steffy", bank_member_position="CEO",
+                            bank_member_about="Hey steffy here", bank_member_email_id="steffy.jk@gmail.com",
+                            bank_member_contact=1234567895)
+        db.session.add(member)
+        db.session.commit()
+
+        loan_choice1 = LoanDetails(id=11, loan_name="Home loan")
+        loan_choice2 = LoanDetails(id=12, loan_name="Car loan")
+        insurance_choice1 = InsuranceDetails(id=13, insurance_name="Life insurance")
+        insurance_choice2 = InsuranceDetails(id=14, insurance_name="Car insurance")
+
+        db.session.add(loan_choice1)
+        db.session.add(loan_choice2)
+        db.session.add(insurance_choice1)
+        db.session.add(insurance_choice2)
         db.session.commit()
 
     yield app
@@ -170,6 +198,7 @@ def client(app):
 @pytest.fixture()
 def runner(app):
     return app.test_cli_runner()
+
 
 # ---------------test model.py's model start----------------------------------
 @pytest.fixture()
@@ -369,7 +398,7 @@ def new_bank_member():
 @pytest.fixture()
 def new_member_role():
     role = MemberRole(
-        id=1,
+        id=5,
         member_role='bank user'
     )
     return role
@@ -471,6 +500,5 @@ def inactive_login(client):
         follow_redirects=True
     )
     return response
-
 
 # ----------------------------------------------

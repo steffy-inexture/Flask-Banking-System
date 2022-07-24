@@ -415,7 +415,7 @@ def account_status(user_id):
                            title='account-status', form=form)
 
 
-@admin.route("/admin/add_branch/", methods=['GET', 'POST'])
+@admin.route("/admin/add-branch/", methods=['GET', 'POST'])
 @login_required
 @authentication_req
 def add_branch():
@@ -438,16 +438,13 @@ def add_branch():
                 bank_id=bank[0].bank_id
             )
             db.session.add(branch)
-            try:
-                db.session.commit()
-                flash(BRANCH_ADDED, FLASH_MESSAGES['SUCCESS'])
-                return redirect(url_for('admin.admin_dashboard'))
-            except Exception as e:
-                flash(f'{e}', FLASH_MESSAGES['FAIL'])
+            db.session.commit()
+            flash(BRANCH_ADDED, FLASH_MESSAGES['SUCCESS'])
+            return redirect(url_for('admin.admin_dashboard'))
     return render_template('add_branch.html', title='add-branch', form=form)
 
 
-@admin.route("/admin/add_atm/", methods=['GET', 'POST'])
+@admin.route("/admin/add-atm/", methods=['GET', 'POST'])
 @login_required
 @authentication_req
 def add_atm():
@@ -469,12 +466,9 @@ def add_atm():
                 bank_id=bank[0].bank_id
             )
             db.session.add(atm)
-            try:
-                db.session.commit()
-                flash(ATM_ADDED, FLASH_MESSAGES['SUCCESS'])
-                return redirect(url_for('admin.admin_dashboard'))
-            except Exception as e:
-                flash(f'{e}', FLASH_MESSAGES['FAIL'])
+            db.session.commit()
+            flash(ATM_ADDED, FLASH_MESSAGES['SUCCESS'])
+            return redirect(url_for('admin.admin_dashboard'))
     return render_template('add_atm.html', title='add-atm', form=form)
 
 
@@ -552,7 +546,7 @@ def show_member_role_list():
     return render_template('member_role_data.html', roles=roles)
 
 
-@admin.route("/admin/delete_member_role_from_list/<id>", methods=['GET', 'POST'])
+@admin.route("/admin/delete-member-role-from-list/<id>", methods=['GET', 'POST'])
 @login_required
 @authentication_req
 def delete_member_role_list(id):
