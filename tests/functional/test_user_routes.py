@@ -64,6 +64,7 @@ def test_duplication_in_user_email_registration(client):
     assert response.status_code == 200
     assert 'That email is taken please Choose different one' in str(response.data)
 
+#admin can also add user
 def test_registration_with_admin(client, admin_login):
     response = client.post("/user/registration",
                            data=dict(
@@ -79,14 +80,14 @@ def test_registration_with_admin(client, admin_login):
     assert 'steffy.inexture@gmail.com' in str(admin_login.data)
     assert 'New user added successfully' in str(response.data)
 
-
+#succsessfull log in
 def test_login(login):
     assert 'Login successfully' in str(login.data)
     assert login.status_code == 200
     assert login.request.path == "/user-dashboard"
 
 
-# user tries to login but the account is not activated by admin
+# user tries to log in but the account is not activated by admin
 def test_login_inactive_account(client):
     res = client.post("/login", data=dict(user_email='inactive.jk2018@gmail.com',
                                           user_password='inactive@123', remember="y"),
@@ -107,7 +108,7 @@ def test_wrong_credentials(login_fake):
     assert 'Login unsuccessfully..please check email and password' in str(login_fake.data)
     assert login_fake.status_code == 200
 
-
+# user dashboard's get request
 def test_dashboard(client, login):
     data = client.get(
         "/user-dashboard",

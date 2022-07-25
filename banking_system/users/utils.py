@@ -5,7 +5,7 @@ from flask_mail import Message
 from validate_email_address import validate_email
 from wtforms import ValidationError
 from banking_system import mail, db
-from banking_system.models import User, UserType, LoanType, Loan, Insurance, InsuranceType, TransactionType, \
+from banking_system.models import User, UserType, LoanType, Insurance, InsuranceType, TransactionType, \
     OtpByMail
 
 from functools import wraps
