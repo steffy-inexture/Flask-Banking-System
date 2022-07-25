@@ -3,6 +3,8 @@ import pdfkit
 from flask import render_template, url_for, flash, redirect, request, Blueprint, session, make_response
 from flask_login import login_user, current_user, logout_user, login_required
 from sqlalchemy import func
+from sqlalchemy.exc import PendingRollbackError
+
 from banking_system import db, bcrypt
 from banking_system.models import Account, Branch, Card, FixedDeposit, Insurance, Loan, \
     Transaction, TransactionType, User, LoanDetails, InsuranceDetails, OtpByMail
@@ -38,6 +40,8 @@ def register():
             after successful registration : 'users.login' [ aka login page ]
             after unsuccessful registration : 'users.register' [ aka registration page ]
     """
+    # if PendingRollbackError:
+    #     session.rollback()
     form = RegistrationForm()
     if form.validate_on_submit():
         user_name = form.user_name.data,
@@ -52,14 +56,18 @@ def register():
         user_age = form.user_age.data,
         date_of_birth = form.date_of_birth.data
         user = User(user_name=user_name, user_password=user_password, user_email=user_email,
-                    user_phone_number=user_phone_number, user_first_name=user_first_name, user_last_name=user_last_name,
+                    u_p=user_phone_number, user_first_name=user_first_name, user_last_name=user_last_name,
                     user_address=user_address, user_age=user_age, date_of_birth=date_of_birth)
         db.session.add(user)
         try:
             db.session.commit()
         except Exception as e:
-            flash(f'{e}', FLASH_MESSAGES['FAIL'])
-        user = User.query.filter_by(user_email=form.user_email.data).first()
+            db.session.rollback()
+        finally:
+            db.session.commit()
+
+        for user in User.query.all():
+            print(user)
         role_assign(user.user_id)
         account_creation(user.user_id)
         if current_user.is_authenticated:
@@ -71,7 +79,7 @@ def register():
     return render_template('register.html', title='Register', form=form)
 
 
-@users.route("/user/registration/account-creation", methods=['GET', 'POST'])
+@users.route("/user/registration/account-creation/<user_id>", methods=['GET', 'POST'])
 def account_creation(user_id):
     """
         Account creation for user
@@ -126,9 +134,11 @@ def change_branch():
             account.branch_id = branch.branch_id
             db.session.commit()
             flash(BRANCH_CHANGED, FLASH_MESSAGES['SUCCESS'])
+            return redirect(url_for('users.dashboard'))
         else:
             flash(ERROR, FLASH_MESSAGES['FAIL'])
-        return redirect(url_for('users.dashboard'))
+            return redirect(url_for('users.dashboard'))
+        # return redirect(url_for('users.dashboard'))
     elif request.method == 'GET':
         form.user_id.data = user.user_id
         form.user_name.data = user.user_name
@@ -685,7 +695,7 @@ def fd_interest_money():
         else:
             flash(ALREADY_DONE, FLASH_MESSAGES['FAIL'])
     elif old_date.date() == now.date():
-        if old_date.time() < now.date():
+        if old_date.date() < now.date():
             count += 1
             if count == 1:
                 amount = (fd.fd_amount * fd.rate_interest) / 100
@@ -745,6 +755,3 @@ def bank_statement_pdf():
     response.headers["Content-Disposition"] = "attachment;filename=bank_statement.pdf"
     return response
 
-# for testing purpose
-def add(a, b):
-    return a + b

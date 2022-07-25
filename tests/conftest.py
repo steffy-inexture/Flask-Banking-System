@@ -90,10 +90,22 @@ def app():
             date_of_birth=datetime.utcnow()
         )
 
+        user_has_no_acc = User(user_id=85, user_name='userno', user_password='useno@123',
+                               user_email='userno.jk2018@gmail.com', u_p=1234567898, user_first_name='inactive',
+                               user_last_name='jk', user_address='407,NYC', user_age=21,
+                               date_of_birth=datetime.utcnow())
+
+        user_has_no_loan = User(user_id=95, user_name='loanuser', user_password='loanuser@123',
+                                user_email='loanuser.jk2018@gmail.com', u_p=1234567898, user_first_name='loan',
+                                user_last_name='jk', user_address='407,NYC', user_age=21,
+                                date_of_birth=datetime.utcnow())
+
         db.session.add(user1)
         db.session.add(user2)
         db.session.add(admin)
         db.session.add(inactive_user)
+        db.session.add(user_has_no_acc)
+        db.session.add(user_has_no_loan)
         db.session.commit()
 
         user_type1 = UserType(user_id=user1.user_id,
@@ -103,6 +115,7 @@ def app():
 
         inactive_type = UserType(user_id=inactive_user.user_id,
                                  user_role='user')
+
         db.session.add(user_type1)
         db.session.add(admin_type)
         db.session.add(inactive_type)
@@ -137,8 +150,18 @@ def app():
             user_id=5,
             branch_id=1
         )
+        no_loan_user_ac = Account(
+            account_number=1000008,
+            account_status='Active',
+            account_balance=5000,
+            saving_balance=0,
+            account_creation_date=datetime.utcnow(),
+            user_id=95,
+            branch_id=1
+        )
         db.session.add(account_user2)
         db.session.add(inactive_acc)
+        db.session.add(no_loan_user_ac)
         db.session.commit()
 
         card1 = Card(card_number=1, cvv_number=1234, card_pin=1234, creation_date=datetime.utcnow(),
@@ -154,11 +177,15 @@ def app():
         fd1 = FixedDeposit(fd_id=1, fd_amount=5000, fd_status='Active', rate_interest=5.6,
                            fd_create_date=datetime.utcnow(), fd_duration=datetime.utcnow(),
                            added_amount=0, account_number=1000000)
+        inactive_fd = FixedDeposit(fd_id=2, fd_amount=5000, fd_status='Inactive', rate_interest=5.6,
+                                   fd_create_date=datetime.utcnow(), fd_duration=datetime.utcnow(),
+                                   added_amount=0, account_number=1000008)
         db.session.add(insurance_type1)
         db.session.add(loan1)
         db.session.add(loan_type1)
         db.session.add(insurance1)
         db.session.add(fd1)
+        db.session.add(inactive_fd)
         db.session.commit()
 
         role_for_member = MemberRole(id=7, member_role="CEO")
@@ -496,6 +523,21 @@ def inactive_login(client):
             user_id=1,
             user_email='inactive.jk2018@gmail.com',
             user_password='inactive@123',
+            remember='y'),
+        follow_redirects=True
+    )
+    return response
+
+
+@pytest.fixture()
+def login_user_nine_five(client):
+    """Login helper function"""
+    response = client.post(
+        "/login",
+        data=dict(
+            user_id=95,
+            user_email='loanuser.jk2018@gmail.com',
+            user_password='loanuser@123',
             remember='y'),
         follow_redirects=True
     )

@@ -1,20 +1,36 @@
 from datetime import datetime
 
-
-def test_registration(client):
+# registration successfully
+def test_registration_post(client):
     response = client.post("/user/registration",
-                           data=dict(
-                               user_name='sdfghjk', user_email='vacationsfever2021@gmail.com',
-                               user_phone_number=1234567895, user_first_name='steff',
-                               user_last_name='steffjk', user_address='407,NYC',
-                               user_age=21, date_of_birth=datetime.utcnow(),
-                               user_password='steff@123', confirm_password='steff@123',
-                               submit="Sign Up")
+                           data=dict(user_id=55,
+                                     user_name='dghj', user_email='vacationsfever2021@gmail.com',
+                                     user_phone_number=1234567895, user_first_name='steff',
+                                     user_last_name='steffjk', user_address='407,NYC',
+                                     user_age=21,
+                                     user_password='steff@123', confirm_password='steff@123',
+                                     submit="Sign Up", role_assign=True,
+                                     date_of_birth="1111-11-11")
                            , follow_redirects=True
                            )
     assert response.status_code == 200
+    assert 'Your account has been created you are all set for login' in str(response.data)
 
-    # assert 'Your account has been created you are all set for login' in str(response.data)
+# registration while empty field [ same for all field ]
+def test_registration_empty_field(client):
+    response = client.post("/user/registration",
+                           data=dict(user_id=55,
+                                     user_name='', user_email='vacationsfever2021@gmail.com',
+                                     user_phone_number=1234567895, user_first_name='steff',
+                                     user_last_name='steffjk', user_address='407,NYC',
+                                     user_age=21,
+                                     user_password='steff@123', confirm_password='steff@123',
+                                     submit="Sign Up", role_assign=True,
+                                     date_of_birth="1111-11-11")
+                           , follow_redirects=True
+                           )
+    assert response.status_code == 200
+    assert 'This field is required' in str(response.data)
 
 
 # check validation for duplication in user_name while registration
@@ -24,7 +40,7 @@ def test_duplication_in_user_name_registration(client):
                                user_name='steffy', user_email='vacationsfever2021@gmail.com',
                                user_phone_number=1234567895, user_first_name='steff',
                                user_last_name='steffjk', user_address='407,NYC',
-                               user_age=21, date_of_birth="19-7-2000",
+                               user_age=21, date_of_birth="2000-12-12",
                                user_password='steff@123', confirm_password='steff@123',
                                submit="Sign Up")
                            , follow_redirects=True
@@ -48,39 +64,20 @@ def test_duplication_in_user_email_registration(client):
     assert response.status_code == 200
     assert 'That email is taken please Choose different one' in str(response.data)
 
+def test_registration_with_admin(client, admin_login):
+    response = client.post("/user/registration",
+                           data=dict(
+                               user_id=7, user_name='steff', user_email='steff@gmail.com',
+                               user_phone_number=1234567894, user_first_name='steff',
+                               user_last_name='steffjk', user_address='407,NYC',
+                               user_age=21, date_of_birth="2000-12-12",
+                               user_password='steff@123', confirm_password='steff@123',
+                               role_assign=True, account_creation=True
+                           ), follow_redirects=True
+                           )
 
-# check validation for user_email is actual exist or not while registration [pending]
-# def test_registration(client):
-#     response = client.post("/user/registration",
-#                            data=dict(
-#                                user_name='steffy', user_email='dfghjkgfcghjkljhgfxcv2018@gmail.com',
-#                                user_phone_number=1234567895, user_first_name='steff',
-#                                user_last_name='steffjk', user_address='407,NYC',
-#                                user_age=21, date_of_birth=datetime.utcnow(),
-#                                user_password='steff@123', confirm_password='steff@123',
-#                             submit="Sign Up")
-#                            , follow_redirects=True
-#                            )
-#     assert response.status_code == 200
-#     assert 'This email id is not exist' in str(response.data)
-
-
-# def test_registration_with_admin(client,admin_login):
-#     response = client.post("/user/registration",
-#                            data=dict(
-#                                user_id=7, user_name='steff', user_email='steff@gmail.com',
-#                                user_phone_number=1234567894, user_first_name='steff',
-#                                user_last_name='steffjk', user_address='407,NYC',
-#                                user_age=21, date_of_birth=datetime.utcnow(),
-#                                user_password='steff@123', confirm_password='steff@123',
-#                                role_assign=True, account_creation=True
-#                            ), follow_redirects=True
-#                            )
-#
-#     assert 'steffy.inexture@gmail.com' in str(admin_login.data)
-#     print("8888888888888888888888",admin_login.data)
-#     if current_user.user_email == 'steffy.inexture@gmail.com':
-#         assert 'New user added successfully' in str(response.data)
+    assert 'steffy.inexture@gmail.com' in str(admin_login.data)
+    assert 'New user added successfully' in str(response.data)
 
 
 def test_login(login):
@@ -138,7 +135,7 @@ def test_profile_post(client):
             user_age=21,
             user_address='dfgh',
             user_email='sjk@gmail.com',
-            date_of_birth=19 - 7 - 2000
+            date_of_birth="2000-12-12"
         ),
         follow_redirects=True
     )
@@ -163,6 +160,25 @@ def test_profile_post(client):
     )
     assert response.status_code == 200
     assert response.request.path == "/login"
+
+
+def test_profile_post_by_admin(client, admin_login):
+    response = client.post(
+        "/profile",
+        data=dict(
+            user_name='steff',
+            user_email="steffy.inexture@gmail.com",
+            user_phone_number=1234567895,
+            user_first_name='steff',
+            user_last_name='jk',
+            user_age=21,
+            user_address='dfgh',
+            date_of_birth="2000-12-12"
+        ),
+        follow_redirects=True
+    )
+    assert response.status_code == 200
+    assert 'Your account has been update!' in str(response.data)
 
 
 # need to log in for accessing this end point
@@ -209,16 +225,6 @@ def test_already_loan_exist(client, login):
         follow_redirects=True)
     assert 'You have already current LOAN' in str(response.data)
 
-
-# creating new loan req. [ recheck this one - duplication]
-# def test_create_new_loan(client, login2):
-#     response = client.post(
-#         "/user/apply-for-loan",
-#         data=dict(loan_amount_choices=1, loan_rate_interests=1, loan_type='data', add_loan_type=True),
-#         follow_redirects=True)
-#     assert response.status_code == 200
-#     assert 'Your LOAN has been requested with inactive status' in str(response.data)
-
 def test_get_req_loan(client, login):
     get_data = client.get(
         "/user/apply-for-loan",
@@ -243,6 +249,24 @@ def test_create_new_insurance(client, login2):
     response = client.post(
         "/user/request-insurance",
         data=dict(insurance_amount_choices=1, insurance_type='Home insurance'),
+        follow_redirects=True)
+    assert response.status_code == 200
+    assert 'Your Insurance has been requested with inactive status' in str(response.data)
+
+
+def test_create_new_insurance_choice2(client, login2):
+    response = client.post(
+        "/user/request-insurance",
+        data=dict(insurance_amount_choices=2, insurance_type='Home insurance'),
+        follow_redirects=True)
+    assert response.status_code == 200
+    assert 'Your Insurance has been requested with inactive status' in str(response.data)
+
+
+def test_create_new_insurance_choice_3(client, login2):
+    response = client.post(
+        "/user/request-insurance",
+        data=dict(insurance_amount_choices=3, insurance_type='Home insurance'),
         follow_redirects=True)
     assert response.status_code == 200
     assert 'Your Insurance has been requested with inactive status' in str(response.data)
@@ -367,16 +391,37 @@ def test_user_money_form_data(client, login):
     assert 'Insufficient balance' in str(response.data)
 
 
-# check weather saving balance < transfer balance for choice 2 [ pending ]
-# def test_saving_to_account_transfer_option(client, login):
-#     response = client.post("/user/transfer-money",
-#                            data=dict(user_id=1, user_name='steffy', transfer_choice='2',
-#                                      transfer_amount=5003, user_password='steffy@123', otp_btn=True,
-#                                      ),
-#                            follow_redirects=True)
-#     assert response.status_code == 200
-#     print("this is for savinng:::::::::",response.data)
-#     assert 'Insufficient balance' in str(response.data)
+# check weather transfer amount > account balance for choice 4 [ fd ]
+def test_user_money_form_data(client, login):
+    response = client.post("/user/transfer-money",
+                           data=dict(user_id=1, user_name='steffy', transfer_choice='4',
+                                     transfer_amount=5003, user_password='steffy@123', otp_btn=True,
+                                     ),
+                           follow_redirects=True)
+    assert response.status_code == 200
+    assert 'Insufficient balance' in str(response.data)
+
+# user has not applied for fd yet
+def test_user_money_but_user_has_no_fd(client, login2):
+    response = client.post("/user/transfer-money",
+                           data=dict(user_id=2, user_name='stella', transfer_choice='4',
+                                     transfer_amount=250, user_password='stella@123', otp_btn=True,
+                                     ),
+                           follow_redirects=True)
+    assert response.status_code == 200
+    assert 'you have not requested for fd yet' in str(response.data)
+
+
+# user has fd but its inactive
+def test_user_money_but_inactive_fd(client, login_user_nine_five):
+    response = client.post("/user/transfer-money",
+                           data=dict(user_id=95, user_name='loanuser', transfer_choice='4',
+                                     transfer_amount=250, user_password='loanuser@123', otp_btn=True,
+                                     ),
+                           follow_redirects=True)
+    assert response.status_code == 200
+    assert 'Fd status needs to activate first' in str(response.data)
+
 
 # reset password info request
 def test_reset_req(client):
@@ -385,11 +430,107 @@ def test_reset_req(client):
                            follow_redirects=True)
     assert 'An email has been sent with instruction to reset your password.' in str(response.data)
 
-def test_reset_req(client,login):
+
+def test_reset_req_get(client, login):
     response = client.post("/reset_password",
                            follow_redirects=True)
     assert response.status_code == 200
 
-def test_bank_statement(client,login):
-    response = client.post("/user/bank-statement/",follow_redirects=True)
-    assert  response.status_code == 200
+
+def test_bank_statement(client, login):
+    response = client.post("/user/bank-statement/", follow_redirects=True)
+    assert response.status_code == 200
+
+
+# change the branch by the user
+# case-1 branch is existed
+def test_change_account_branch(client, login):
+    response = client.post("/user/change_branch",
+                           data=dict(user_id=1, user_name="steffy", account_number=1000000,
+                                     myField="test branch"), follow_redirects=True)
+    assert response.status_code == 200
+    assert 'Bank branch has been updated/changed' in str(response.data)
+
+
+# case-2 branch is not existed throwing error
+def test_branch_is_not_existed(client, login):
+    response = client.post("/user/change_branch",
+                           data=dict(user_id=1, user_name="steffy", account_number=1000000,
+                                     myField="test d"), follow_redirects=True)
+    assert response.status_code == 200
+    assert 'There is some error' in str(response.data)
+
+
+# for applying fixed deposit by user side
+
+# case-1 user already have fixed deposit
+def test_add_fd_but_user_already_have_fd(client, login):
+    response = client.get("/user/add_fixed_deposit", follow_redirects=True)
+    assert 'You have already current {activity}'.format(activity="FIXED DEPOSIT") in str(response.data)
+
+
+# case-2 user has applied for fd for the first time [ so successfully apply for fd ]
+def test_add_fd_but_user_apply_for_first_time(client, login2):
+    response = client.get("/user/add_fixed_deposit", follow_redirects=True)
+    assert 'Your {activity} has been requested with inactive status'.format(activity="FIXED DEPOSIT") in str(
+        response.data)
+
+
+# for applying the loan requests
+# case 1 choose 1st option
+def test_apply_loan_with_first(client, login_user_nine_five):
+    response = client.post("/user/apply-for-loan",
+                           data=dict(user_id=95, user_name="loanuser", loan_amount_choices=1,
+                                     loan_rate_interests=1, loan_type="Home loan"),
+                           follow_redirects=True)
+    assert 'Your {activity} has been requested with inactive status'.format(activity="loan") in str(response.data)
+
+
+# case 1 choose 2st option
+def test_apply_loan_with_second(client, login_user_nine_five):
+    response = client.post("/user/apply-for-loan",
+                           data=dict(user_id=95, user_name="loanuser", loan_amount_choices=2,
+                                     loan_rate_interests=2, loan_type="Home loan"),
+                           follow_redirects=True)
+    assert 'Your {activity} has been requested with inactive status'.format(activity="loan") in str(response.data)
+
+
+# case 1 choose 3rd option
+def test_apply_loan_with(client, login_user_nine_five):
+    response = client.post("/user/apply-for-loan",
+                           data=dict(user_id=95, user_name="loanuser", loan_amount_choices=3,
+                                     loan_rate_interests=1, loan_type="Home loan"),
+                           follow_redirects=True)
+    assert 'Your {activity} has been requested with inactive status'.format(activity="loan") in str(response.data)
+
+
+# money transaction
+# case-1 to someone else account
+def test_money_success_to_someone_acc(client, login):
+    res = client.post("/user/add-money-to-other",
+                      data=dict(reciver_account=1000001, credit_amount=100, user_password="steffy@123"),
+                      follow_redirects=True)
+    assert "Transaction is successfully done" in str(res.data)
+
+
+# case-2 to account itself
+def test_money_success_to_same_acc(client, login):
+    res = client.post("/user/add-money-to-other",
+                      data=dict(reciver_account=1000000, credit_amount=100, user_password="steffy@123"),
+                      follow_redirects=True)
+    assert 'You can not transfer to yourself it does not make any sense' in str(res.data)
+
+
+# case-3 insufficient balance
+def test_money_but_insufficient_balance(client, login):
+    res = client.post("/user/add-money-to-other",
+                      data=dict(reciver_account=1000001, credit_amount=5040, user_password="steffy@123"),
+                      follow_redirects=True)
+    assert 'Insufficient balance you have only:5000' in str(res.data)
+
+# case4 incorrect password
+def test_money_but_incorrect_pwd(client, login):
+    res = client.post("/user/add-money-to-other",
+                      data=dict(reciver_account=1000001, credit_amount=250, user_password="65@123"),
+                      follow_redirects=True)
+    assert 'Password is incorrect' in str(res.data)

@@ -26,7 +26,7 @@ class User(db.Model, UserMixin):
     user_last_name = db.Column(db.String(320), nullable=False)
     user_address = db.Column(db.String(120), nullable=False)
     user_age = db.Column(db.Integer, nullable=False)
-    date_of_birth = db.Column(db.DateTime, nullable=False)
+    date_of_birth = db.Column(db.DateTime, nullable=False,default=datetime.utcnow())
 
     user_type = relationship("UserType", cascade="all, delete", backref='user')
     account = relationship("Account", cascade="all, delete")
