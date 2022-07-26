@@ -116,9 +116,17 @@ def app():
         inactive_type = UserType(user_id=inactive_user.user_id,
                                  user_role='user')
 
+        user_type2=UserType(user_id=user2.user_id,user_role='user')
+        no_acc_user_type=UserType(user_id=user_has_no_acc.user_id,user_role='user')
+        no_loan_type=UserType(user_id=user_has_no_loan.user_id,user_role='user')
+
         db.session.add(user_type1)
         db.session.add(admin_type)
         db.session.add(inactive_type)
+        db.session.add(user_type2)
+        db.session.add(no_acc_user_type)
+        db.session.add(no_loan_type)
+
         db.session.commit()
 
         account_user1 = Account(
@@ -472,7 +480,7 @@ def login(client):
 def admin_login(client):
     """admin Login helper function"""
     response = client.post(
-        "/admin_login/",
+        "/admin-login/",
         data=dict(
             user_id=3,
             user_name='admin',

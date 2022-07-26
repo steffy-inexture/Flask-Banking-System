@@ -24,13 +24,13 @@ def test_get_bank_member(client, admin_login):
 
 
 def test_admin_login(client):
-    response = client.post("/admin_login", data=dict(user_id=5, user_email='steffy_inexture@gmail.com',
+    response = client.post("/admin-login", data=dict(user_id=5, user_email='steffy_inexture@gmail.com',
                                                      user_password='admin@123', remember="y"), follow_redirects=True)
     assert 'Admin Login successfully..' in str(response.data)
 
 
 def test_admin_login_creditential(client):
-    response = client.post("/admin_login", data=dict(user_id=5, user_email='steffy_inexture@gmail.com',
+    response = client.post("/admin-login", data=dict(user_id=5, user_email='steffy_inexture@gmail.com',
                                                      user_password='steff@123', remember="y"), follow_redirects=True)
     assert 'Login unsuccessfully..please check email and password' in str(response.data)
     assert response.status_code == 200

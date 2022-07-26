@@ -130,5 +130,21 @@ def authentication_req(f):
 
     return decorated_function
 
+# define the decorator for authentication of particular endpoint weather the login has been done by the particulare user only
+def user_auth(f):
+    @wraps(f)
+    def decorator_fun(*args, **kwargs):
+        if current_user is None:
+            flash("you need to login first", 'danger')
+            return redirect(url_for('main.home', next=request.url))
+        if current_user:
+            user_type=UserType.query.filter_by(user_id=current_user.user_id).first()
+            if not user_type.user_role == 'user':
+                flash("only user can has the access that page", 'danger')
+                return redirect(url_for('main.home', next=request.url))
+        return f(*args, **kwargs)
+
+    return decorator_fun
+
 
 

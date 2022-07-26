@@ -16,7 +16,7 @@ from banking_system.admin.constants import ADMIN_LOGIN_SUCCESS, FLASH_MESSAGES, 
 admin = Blueprint('admin', __name__)
 
 
-@admin.route("/admin_login/", methods=['GET', 'POST'])
+@admin.route("/admin-login/", methods=['GET', 'POST'])
 def admin_login():
     """
         For admin login

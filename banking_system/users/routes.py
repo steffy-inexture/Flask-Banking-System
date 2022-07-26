@@ -11,7 +11,7 @@ from banking_system.models import Account, Branch, Card, FixedDeposit, Insurance
 from banking_system.users.forms import AddMoney, RegistrationForm, LoginForm, UpdateAccountForm, RequestResetForm, \
     ResetPasswordForm, ApplyLoanForm, TransferMoney, ChangeBranch, ApplyInsuranceForm, OtpCheck
 from banking_system.users.utils import send_reset_email, send_otp_email, role_assign, add_loan_type, \
-    insurance_type, add_transaction_type
+    insurance_type, add_transaction_type, user_auth
 import random
 import datetime
 from banking_system.users.constants import FLASH_MESSAGES, NEW_USER_ADDED, SUCCESSFUL_REGISTRATION, \
@@ -112,6 +112,7 @@ def account_creation(user_id):
 
 @users.route("/user/change_branch", methods=['GET', 'POST'])
 @login_required
+@user_auth
 def change_branch():
     """
         User can change his/her bank account's branch
@@ -190,6 +191,7 @@ def login():
 
 @users.route("/user-dashboard", methods=['GET', 'POST'])
 @login_required
+@user_auth
 def dashboard():
     """
         dashboard route
@@ -321,6 +323,7 @@ def reset_token(token):
 
 @users.route("/user/request-card", methods=['GET', 'POST'])
 @login_required
+@user_auth
 def request_card():
     """
         Request for the card if not have carded yet
@@ -364,6 +367,7 @@ def request_card():
 
 @users.route("/user/apply-for-loan", methods=['GET', 'POST'])
 @login_required
+@user_auth
 def apply_loan():
     """
          apply for loan via this route [ request goes to admin panel with INACTIVE STATUS]
@@ -396,6 +400,9 @@ def apply_loan():
             else:
                 rate_interest = '6.7'
 
+            loan_amount = int(loan_amount)
+            loan_amount = loan_amount + ((loan_amount * float(rate_interest)) / 100)
+
             loan_type = form.loan_type.data
             loan = Loan(user_id=user.user_id, loan_amount=loan_amount, rate_interest=rate_interest)
             db.session.add(loan)
@@ -421,6 +428,7 @@ def apply_loan():
 
 @users.route("/user/request-insurance", methods=['GET', 'POST'])
 @login_required
+@user_auth
 def request_insurance():
     """
         apply for insurance via this route [ request goes to admin panel with INACTIVE STATUS]
@@ -472,6 +480,7 @@ def request_insurance():
 
 @users.route("/user/add_fixed_deposit", methods=['GET', 'POST'])
 @login_required
+@user_auth
 def add_fixed_deposit():
     """
         Add fixed deposit by using ths route
@@ -499,6 +508,7 @@ def add_fixed_deposit():
 
 @users.route("/user/add-money-to-other", methods=['GET', 'POST'])
 @login_required
+@user_auth
 def add_money():
     """
         Transfer money from current user to another bank user account
@@ -551,6 +561,7 @@ def add_money():
 
 @users.route("/user/transfer-money", methods=['GET', 'POST'])
 @login_required
+@user_auth
 def transfer_money():
     """
         Transfer money from user to some other data
@@ -618,6 +629,7 @@ def transfer_money():
 
 @users.route("/user/otp-check", methods=['GET', 'POST'])
 @login_required
+@user_auth
 def otp_check():
     """
         check the otp sends to the user email
@@ -675,6 +687,7 @@ count = 0
 
 @users.route("/fd-money-transfer/", methods=['GET', 'POST'])
 @login_required
+@user_auth
 def fd_interest_money():
     """
         add the interested money which is get by particular time duration
@@ -709,6 +722,7 @@ def fd_interest_money():
 
 @users.route("/user/bank-statement/", methods=['GET', 'POST'])
 @login_required
+@user_auth
 def bank_statement():
     """
         shows the past transaction's data of the current user
@@ -730,6 +744,7 @@ def bank_statement():
 
 @users.route("/user/bank-statement-pdf/", methods=['GET', 'POST'])
 @login_required
+@user_auth
 def bank_statement_pdf():
     """
         downloads the pdf for user's bank statement data
