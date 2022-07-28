@@ -181,7 +181,7 @@ class FixedDeposit(db.Model):
     fd_id = db.Column(db.Integer, primary_key=True)
     fd_amount = db.Column(db.Float, nullable=False, default=0.0)
     fd_status = db.Column(db.String(100), nullable=False, default='Inactive')
-    rate_interest = db.Column(db.Float, nullable=False, default=0.0)
+    rate_interest = db.Column(db.Float, nullable=False, default=5)
     fd_create_date = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     fd_duration = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     added_amount = db.Column(db.Float, nullable=False, default=0.0)

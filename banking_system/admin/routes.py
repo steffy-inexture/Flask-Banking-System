@@ -204,7 +204,7 @@ def loan_approval(user_id):
                 approval_status = form.approval_status.data
                 if approval_status == '1':
                     loan.loan_status = 'Active'
-                    add_loan_money_to_user(user_id, loan.loan_amount, loan.loan_type)
+                    add_loan_money_to_user(user_id, loan.loan_amount, loan_type.loan_type)
                 else:
                     loan.loan_status = 'Inactive'
                 db.session.commit()

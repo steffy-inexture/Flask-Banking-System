@@ -1,7 +1,10 @@
 from celery import Celery
 
+from banking_system import create_app
 
-def make_celery(app_name='celery_config'):
+app = create_app()
+
+def make_celery(app_name):
     # backend = "redis://localhost:6379"
     # broker = "redis://localhost:6379"
     #
@@ -10,11 +13,8 @@ def make_celery(app_name='celery_config'):
     #
     # return Celery(app_name, backend=backend, broker=broker)
 
-    celery = Celery(
-        app_name,
-        backend="redis://localhost:6379",
-        broker="redis://localhost:6379"
-    )
+    celery = Celery(app_name, backend="redis://localhost:6379", broker="redis://localhost:6379")
+
     # celery.conf.update(app_name.config)
 
     class ContextTask(celery.Task):
@@ -24,5 +24,5 @@ def make_celery(app_name='celery_config'):
 
     celery.Task = ContextTask
     return celery
-celery = make_celery()
-print(celery,"sdasdjajkdajsdhjkasd")
+
+celery = make_celery(app)

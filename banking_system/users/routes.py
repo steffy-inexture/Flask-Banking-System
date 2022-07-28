@@ -19,8 +19,7 @@ from banking_system.users.constants import FLASH_MESSAGES, NEW_USER_ADDED, SUCCE
     CARD_CREATED, TRANSACTION_SUCCESSFULLY, CANT_TRANSFER, \
     PASSWORD_INCORRECT, INSUFFICIENT_BALANCE, PENDING_ACTIVITY, SUCCESS_ACTIVITY, BRANCH_CHANGED, ERROR, \
     SOMETHING_WENT_WRONG, SUCCESSFUL_TRANSACTION, WRONG_OTP, ALREADY_DONE, FD_ADDED, PASSWORD_CHANGED, \
-    INCORRECT_OLD_PASSWORD, INCORRECT_CONFIRM_PASSWORD
-from celery_config import celery
+    INCORRECT_OLD_PASSWORD, INCORRECT_CONFIRM_PASSWORD, NO_FD_FOUND
 
 users = Blueprint('users', __name__)
 
@@ -57,7 +56,7 @@ def register():
         user_age = form.user_age.data,
         date_of_birth = form.date_of_birth.data
         user = User(user_name=user_name, user_password=user_password, user_email=user_email,
-                    u_p=user_phone_number, user_first_name=user_first_name, user_last_name=user_last_name,
+                    user_phone_number=user_phone_number, user_first_name=user_first_name, user_last_name=user_last_name,
                     user_address=user_address, user_age=user_age, date_of_birth=date_of_birth)
         db.session.add(user)
         try:
@@ -67,8 +66,6 @@ def register():
         finally:
             db.session.commit()
 
-        for user in User.query.all():
-            print(user)
         role_assign(user.user_id)
         account_creation(user.user_id)
         if current_user.is_authenticated:
@@ -174,7 +171,6 @@ def login():
                 if account.account_status == 'Inactive':
                     flash(ADMIN_NOT_ACTIVATE_UR_ACCOUNT, FLASH_MESSAGES['FAIL'])
                     return redirect(url_for('users.login'))
-                    # continue
                 elif account.account_status == 'Active':
                     if user is not None and form.user_password.data == user.user_password:
                         login_user(user, remember=form.remember.data)
@@ -498,8 +494,9 @@ def add_fixed_deposit():
             fixed_deposit = FixedDeposit(account_number=account.account_number)
             db.session.add(fixed_deposit)
             db.session.commit()
-            data=current_user.user_id
-            fd_money_by_celery.delay(data)
+            data = current_user.user_id
+            # below line is for celery implementation
+            # fd_money_by_celery.delay(data)
             flash(SUCCESS_ACTIVITY.format(activity='FIXED DEPOSIT'), FLASH_MESSAGES['SUCCESS'])
             return redirect(url_for('users.dashboard'))
         else:
@@ -700,18 +697,9 @@ def fd_interest_money():
     global count
     account = Account.query.filter_by(user_id=current_user.user_id).first()
     fd = FixedDeposit.query.filter_by(account_number=account.account_number).first()
-    now = datetime.datetime.now()
-    old_date = fd.fd_create_date
-    if old_date.date() < now.date():
-        count += 1
-        if count == 1:
-            amount = (fd.fd_amount * fd.rate_interest) / 100
-            account.account_balance += ((fd.fd_amount * fd.rate_interest) / 100)
-            db.session.commit()
-            flash(FD_ADDED.format(amount=amount), FLASH_MESSAGES['SUCCESS'])
-        else:
-            flash(ALREADY_DONE, FLASH_MESSAGES['FAIL'])
-    elif old_date.date() == now.date():
+    if fd:
+        now = datetime.datetime.now()
+        old_date = fd.fd_create_date
         if old_date.date() < now.date():
             count += 1
             if count == 1:
@@ -719,9 +707,27 @@ def fd_interest_money():
                 account.account_balance += ((fd.fd_amount * fd.rate_interest) / 100)
                 db.session.commit()
                 flash(FD_ADDED.format(amount=amount), FLASH_MESSAGES['SUCCESS'])
+                return redirect(url_for('users.dashboard'))
             else:
                 flash(ALREADY_DONE, FLASH_MESSAGES['FAIL'])
-    return redirect(url_for('users.dashboard'))
+                return redirect(url_for('users.dashboard'))
+        elif old_date.date() == now.date():
+            if old_date.date() < now.date():
+                count += 1
+                if count == 1:
+                    amount = (fd.fd_amount * fd.rate_interest) / 100
+                    account.account_balance += ((fd.fd_amount * fd.rate_interest) / 100)
+                    db.session.commit()
+                    flash(FD_ADDED.format(amount=amount), FLASH_MESSAGES['SUCCESS'])
+                    return redirect(url_for('users.dashboard'))
+                else:
+                    flash(ALREADY_DONE, FLASH_MESSAGES['FAIL'])
+                    return redirect(url_for('users.dashboard'))
+        return redirect(url_for('users.dashboard'))
+    else:
+        flash(NO_FD_FOUND, FLASH_MESSAGES['FAIL'])
+        return redirect(url_for('users.dashboard'))
+
 
 
 @users.route("/user/bank-statement/", methods=['GET', 'POST'])
@@ -766,7 +772,6 @@ def bank_statement_pdf():
         transaction_type=transaction_type
     )
     WKHTMLTOPDF_CMD = subprocess.Popen(['which', './bin/wkhtmltopdf'], stdout=subprocess.PIPE).communicate()[0].strip()
-    print(f"CONFIG {WKHTMLTOPDF_CMD}")
     pdfkit_config = pdfkit.configuration(wkhtmltopdf=WKHTMLTOPDF_CMD)
     pdf = pdfkit.from_string(render, False, configuration=pdfkit_config)
     response = make_response(pdf)
@@ -808,25 +813,23 @@ def change_password():
         form=form
     )
 
-
-@celery.task()
-def fd_money_by_celery(data):
-    """
-            add the interested money which is get by particular time duration
-            only after admin activated the fd
-        """
-    print('TEST **********************')
-    user=User.query.filter_by(user_id=int(data)).first()
-    account = Account.query.filter_by(user_id=user.user_id).first()
-    fd = FixedDeposit.query.filter_by(account_number=account.account_number).first()
-    account.account_balance += ((fd.fd_amount * fd.rate_interest) / 100)
-    transaction = Transaction(transaction_amount=((fd.fd_amount * fd.rate_interest) / 100),
-                              sender_id=user.user_id,receiver_id=user.user_id,
-                              user_id=user.user_id)
-    db.session.add(transaction)
-    db.session.commit()
-    transaction_type = TransactionType(transaction_id=transaction.transaction_id,
-                                       transaction_type="fd refund RI")
-    db.session.add(transaction_type)
-    db.session.commit()
-
+# @celery.task()
+# def fd_money_by_celery(data):
+#     """
+#             add the interested money which is get by particular time duration
+#             only after admin activated the fd
+#         """
+#     # print('TEST **********************')
+#     user = User.query.filter_by(user_id=int(data)).first()
+#     account = Account.query.filter_by(user_id=user.user_id).first()
+#     fd = FixedDeposit.query.filter_by(account_number=account.account_number).first()
+#     account.account_balance += ((fd.fd_amount * fd.rate_interest) / 100)
+#     transaction = Transaction(transaction_amount=((fd.fd_amount * fd.rate_interest) / 100),
+#                               sender_id=user.user_id, receiver_id=user.user_id,
+#                               user_id=user.user_id)
+#     db.session.add(transaction)
+#     db.session.commit()
+#     transaction_type = TransactionType(transaction_id=transaction.transaction_id,
+#                                        transaction_type="fd refund RI")
+#     db.session.add(transaction_type)
+#     db.session.commit()

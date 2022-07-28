@@ -8,7 +8,7 @@ def test_registration_post(client):
                                      user_phone_number=1234567895, user_first_name='steff',
                                      user_last_name='steffjk', user_address='407,NYC',
                                      user_age=21,
-                                     user_password='steff@123', confirm_password='steff@123',
+                                     user_password='Steff@123', confirm_password='Steff@123',
                                      submit="Sign Up", role_assign=True,
                                      date_of_birth="1111-11-11")
                            , follow_redirects=True

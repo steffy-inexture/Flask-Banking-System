@@ -31,6 +31,7 @@ FD_ADDED = "{amount} has been added"
 PASSWORD_CHANGED = "Your password has been updated successfully"
 INCORRECT_OLD_PASSWORD = "Old password is not correct."
 INCORRECT_CONFIRM_PASSWORD = "Confirm password must be same as new password!"
+NO_FD_FOUND="Fd is not created yet"
 
 FLASH_MESSAGES = {
     'SUCCESS': 'success',

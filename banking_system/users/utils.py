@@ -60,7 +60,7 @@ class CustomValidation:
             raise ValidationError('That username is taken please Choose different one')
 
     def validate_user_email(self, user_email):
-        isvalid = validate_email('user_email', verify=True)
+        isvalid = validate_email('user_email.data', verify=True)
         email = User.query.filter_by(user_email=user_email.data).first()
         if email:
             raise ValidationError('That email is taken please Choose different one')

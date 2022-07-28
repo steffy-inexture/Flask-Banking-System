@@ -1,3 +1,5 @@
+from datetime import datetime, date
+
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, IntegerField, DateField, RadioField, \
     SelectField
@@ -35,7 +37,9 @@ class RegistrationForm(FlaskForm, CustomValidation):
         super().validate_user_email(user_email)
 
     def validate_user_phone_number(self, user_phone_number):
-        if len(str(user_phone_number.data)) != 10:
+        if user_phone_number.data <= 0:
+            raise ValidationError('Please enter the valid number')
+        elif len(str(user_phone_number.data)) != 10:
             raise ValidationError('The length must be 10 for the phone number')
 
     def validate_confirm_password(self, confirm_password):
@@ -43,6 +47,39 @@ class RegistrationForm(FlaskForm, CustomValidation):
         if confirm_password.data != user_password:
             raise ValidationError('Confirm passwd must be equal to paasword')
 
+    def validate_user_age(self, user_age):
+        if (user_age.data) <= 0:
+            raise ValidationError('User age can not be zero or negative')
+
+    def validate_date_of_birth(self, date_of_birth):
+        if date_of_birth.data == date.today():
+            raise ValidationError("Date of birth can not be today's date")
+        elif date_of_birth.data > date.today():
+            raise ValidationError("Date must be before today")
+
+    def validate_user_age(self,user_age):
+        date_of_birth = self.date_of_birth.data
+        today = date.today()
+        age = today.year - date_of_birth.year - ((today.month, today.day) < (date_of_birth.month, date_of_birth.day))
+
+        if age!=user_age.data:
+            raise ValidationError(f"User age and DOB is not appropriate kindly check DOB & Age")
+
+    def validate_user_password(self,user_password):
+        SpecialSym = ['$', '@', '#', '%']
+        user_password=user_password.data
+        if len(user_password) < 6:
+            raise ValidationError('length should be at least 6')
+        if len(user_password) > 20:
+            raise ValidationError('length should be not be greater than 20')
+        if not any(char.isdigit() for char in user_password):
+            raise ValidationError('Password should have at least one numeral')
+        if not any(char.isupper() for char in user_password):
+            raise ValidationError('Password should have at least one uppercase letter')
+        if not any(char.islower() for char in user_password):
+            raise ValidationError('Password should have at least one lowercase letter')
+        if not any(char in SpecialSym for char in user_password):
+            raise ValidationError('Password should have at least one of the symbols $@#')
 
 class LoginForm(FlaskForm):
     """
@@ -79,6 +116,8 @@ class UpdateAccountForm(FlaskForm):
     def validate_user_phone_number(self, user_phone_number):
         if len(str(user_phone_number.data)) != 10:
             raise ValidationError('Phone number must be 10 digits')
+
+
 
 
 # request for reset the password
@@ -256,4 +295,18 @@ class ChangePassword(FlaskForm):
     confirm_new_pwd = PasswordField('Confirm new password: ', validators=[DataRequired()])
     submit = SubmitField('Proceed ')
 
-
+    def validate_new_pwd(self,new_pwd):
+        SpecialSym = ['$', '@', '#', '%']
+        user_password=new_pwd.data
+        if len(user_password) < 6:
+            raise ValidationError('Length should be at least 6')
+        if len(user_password) > 20:
+            raise ValidationError('Length should be not be greater than 20')
+        if not any(char.isdigit() for char in user_password):
+            raise ValidationError('Password should have at least one numeral')
+        if not any(char.isupper() for char in user_password):
+            raise ValidationError('Password should have at least one uppercase letter')
+        if not any(char.islower() for char in user_password):
+            raise ValidationError('Password should have at least one lowercase letter')
+        if not any(char in SpecialSym for char in user_password):
+            raise ValidationError('Password should have at least one of the symbols $@#')

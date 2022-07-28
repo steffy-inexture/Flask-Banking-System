@@ -16,8 +16,8 @@ class Config:
     MAIL_PASSWORD = os.environ.get('EMAIL_PASS')
 
     # for usage of redis [ delete if you are not using this ]
-    CELERY_BROKER_URL = 'redis://127.0.0.1:6379'
+    # CELERY_BROKER_URL = 'redis://127.0.0.1:6379/0'
     # app.config['CELERY_BACKEND'] = 'redis://127.0.0.1:6379'
-    CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379'
-    # app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://postgres:harsh2022@localhost:5432/celery_example"
-    # app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
+    # CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379/0'
+
+
