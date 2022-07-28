@@ -1,5 +1,5 @@
 import os
-
+from os import environ
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -14,3 +14,10 @@ class Config:
     MAIL_USE_TLS = True
     MAIL_USERNAME = os.environ.get('EMAIL_USER')
     MAIL_PASSWORD = os.environ.get('EMAIL_PASS')
+
+    # for usage of redis [ delete if you are not using this ]
+    CELERY_BROKER_URL = 'redis://127.0.0.1:6379'
+    # app.config['CELERY_BACKEND'] = 'redis://127.0.0.1:6379'
+    CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379'
+    # app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://postgres:harsh2022@localhost:5432/celery_example"
+    # app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True

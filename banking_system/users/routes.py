@@ -1,15 +1,14 @@
 import subprocess
+
 import pdfkit
 from flask import render_template, url_for, flash, redirect, request, Blueprint, session, make_response
 from flask_login import login_user, current_user, logout_user, login_required
 from sqlalchemy import func
-from sqlalchemy.exc import PendingRollbackError
-
 from banking_system import db, bcrypt
 from banking_system.models import Account, Branch, Card, FixedDeposit, Insurance, Loan, \
     Transaction, TransactionType, User, LoanDetails, InsuranceDetails, OtpByMail
 from banking_system.users.forms import AddMoney, RegistrationForm, LoginForm, UpdateAccountForm, RequestResetForm, \
-    ResetPasswordForm, ApplyLoanForm, TransferMoney, ChangeBranch, ApplyInsuranceForm, OtpCheck
+    ResetPasswordForm, ApplyLoanForm, TransferMoney, ChangeBranch, ApplyInsuranceForm, OtpCheck, ChangePassword
 from banking_system.users.utils import send_reset_email, send_otp_email, role_assign, add_loan_type, \
     insurance_type, add_transaction_type, user_auth
 import random
@@ -19,7 +18,9 @@ from banking_system.users.constants import FLASH_MESSAGES, NEW_USER_ADDED, SUCCE
     INVALID_TOKEN, PASSWORD_UPDATED, LOGIN_FIRST, ALREADY_CARD_EXISTED, \
     CARD_CREATED, TRANSACTION_SUCCESSFULLY, CANT_TRANSFER, \
     PASSWORD_INCORRECT, INSUFFICIENT_BALANCE, PENDING_ACTIVITY, SUCCESS_ACTIVITY, BRANCH_CHANGED, ERROR, \
-    SOMETHING_WENT_WRONG, SUCCESSFUL_TRANSACTION, WRONG_OTP, ALREADY_DONE, FD_ADDED
+    SOMETHING_WENT_WRONG, SUCCESSFUL_TRANSACTION, WRONG_OTP, ALREADY_DONE, FD_ADDED, PASSWORD_CHANGED, \
+    INCORRECT_OLD_PASSWORD, INCORRECT_CONFIRM_PASSWORD
+from celery_config import celery
 
 users = Blueprint('users', __name__)
 
@@ -173,6 +174,7 @@ def login():
                 if account.account_status == 'Inactive':
                     flash(ADMIN_NOT_ACTIVATE_UR_ACCOUNT, FLASH_MESSAGES['FAIL'])
                     return redirect(url_for('users.login'))
+                    # continue
                 elif account.account_status == 'Active':
                     if user is not None and form.user_password.data == user.user_password:
                         login_user(user, remember=form.remember.data)
@@ -496,6 +498,8 @@ def add_fixed_deposit():
             fixed_deposit = FixedDeposit(account_number=account.account_number)
             db.session.add(fixed_deposit)
             db.session.commit()
+            data=current_user.user_id
+            fd_money_by_celery.delay(data)
             flash(SUCCESS_ACTIVITY.format(activity='FIXED DEPOSIT'), FLASH_MESSAGES['SUCCESS'])
             return redirect(url_for('users.dashboard'))
         else:
@@ -769,4 +773,60 @@ def bank_statement_pdf():
     response.headers["Content-Type"] = "application/pdf"
     response.headers["Content-Disposition"] = "attachment;filename=bank_statement.pdf"
     return response
+
+
+@users.route("/user/change-password/", methods=['GET', 'POST'])
+@login_required
+@user_auth
+def change_password():
+    """
+          User change password
+          User can change their password
+          form:ChangePassword
+          templates: change_password.html [ for taking user credential ex: user email and password ]
+          REDIRECTS TO:
+              After success: user.dashboard [ user route ]
+              After Unsuccess: user.change_password [ with flashing the error ]
+      """
+    form = ChangePassword()
+    if form.validate_on_submit():
+        old_pwd = form.old_pwd.data
+        new_pwd = form.new_pwd.data
+        confirm_pwd = form.confirm_new_pwd.data
+        if old_pwd != current_user.user_password:
+            flash(INCORRECT_OLD_PASSWORD, FLASH_MESSAGES['FAIL'])
+        elif new_pwd != confirm_pwd:
+            flash(INCORRECT_CONFIRM_PASSWORD, FLASH_MESSAGES['FAIL'])
+        else:
+            current_user.user_password = new_pwd
+            db.session.commit()
+            flash(PASSWORD_CHANGED, FLASH_MESSAGES['SUCCESS'])
+            return redirect(url_for('users.dashboard'))
+    return render_template(
+        'change_password.html',
+        title='change password',
+        form=form
+    )
+
+
+@celery.task()
+def fd_money_by_celery(data):
+    """
+            add the interested money which is get by particular time duration
+            only after admin activated the fd
+        """
+    print('TEST **********************')
+    user=User.query.filter_by(user_id=int(data)).first()
+    account = Account.query.filter_by(user_id=user.user_id).first()
+    fd = FixedDeposit.query.filter_by(account_number=account.account_number).first()
+    account.account_balance += ((fd.fd_amount * fd.rate_interest) / 100)
+    transaction = Transaction(transaction_amount=((fd.fd_amount * fd.rate_interest) / 100),
+                              sender_id=user.user_id,receiver_id=user.user_id,
+                              user_id=user.user_id)
+    db.session.add(transaction)
+    db.session.commit()
+    transaction_type = TransactionType(transaction_id=transaction.transaction_id,
+                                       transaction_type="fd refund RI")
+    db.session.add(transaction_type)
+    db.session.commit()
 

@@ -1,5 +1,6 @@
 def test_get_loan_approval(client, admin_login):
     data = client.get("/admin/loan-approval-status/1/", follow_redirects=True)
+
     assert data.status_code == 200
 
 

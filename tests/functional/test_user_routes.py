@@ -19,8 +19,7 @@ def test_registration_post(client):
 # registration while empty field [ same for all field ]
 def test_registration_empty_field(client):
     response = client.post("/user/registration",
-                           data=dict(user_id=55,
-                                     user_name='', user_email='vacationsfever2021@gmail.com',
+                           data=dict(user_name='', user_email='vacationsfever2021@gmail.com',
                                      user_phone_number=1234567895, user_first_name='steff',
                                      user_last_name='steffjk', user_address='407,NYC',
                                      user_age=21,
@@ -56,7 +55,7 @@ def test_duplication_in_user_email_registration(client):
                                user_name='steffy', user_email='steffy.jk2018@gmail.com',
                                user_phone_number=1234567895, user_first_name='steff',
                                user_last_name='steffjk', user_address='407,NYC',
-                               user_age=21, date_of_birth=datetime.utcnow(),
+                               user_age=21, date_of_birth="2020-11-12",
                                user_password='steff@123', confirm_password='steff@123',
                                submit="Sign Up")
                            , follow_redirects=True

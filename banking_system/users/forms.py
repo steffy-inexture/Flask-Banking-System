@@ -244,3 +244,16 @@ class OtpCheck(FlaskForm):
     user_email = user_name = StringField('User Email ', render_kw={'readonly': True})
     otp = IntegerField('Otp:  ')
     submit = SubmitField('Proceed for transaction')
+
+
+class ChangePassword(FlaskForm):
+    """
+        Us can change password
+        if old password is correct then and only new password will be chnages
+    """
+    old_pwd = PasswordField('Old password: ', validators=[DataRequired()])
+    new_pwd = PasswordField('New password: ', validators=[DataRequired()])
+    confirm_new_pwd = PasswordField('Confirm new password: ', validators=[DataRequired()])
+    submit = SubmitField('Proceed ')
+
+
