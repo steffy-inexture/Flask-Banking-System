@@ -4,13 +4,13 @@ from datetime import datetime
 def test_registration_post(client):
     response = client.post("/user/registration",
                            data=dict(user_id=55,
-                                     user_name='dghj', user_email='vacationsfever2021@gmail.com',
+                                     user_name='demodata', user_email='vacationsfever2021@gmail.com',
                                      user_phone_number=1234567895, user_first_name='steff',
                                      user_last_name='steffjk', user_address='407,NYC',
-                                     user_age=21,
+                                     user_age=22,
                                      user_password='Steff@123', confirm_password='Steff@123',
                                      submit="Sign Up", role_assign=True,
-                                     date_of_birth="1111-11-11")
+                                     date_of_birth="2000-5-19")
                            , follow_redirects=True
                            )
     assert response.status_code == 200
@@ -22,10 +22,10 @@ def test_registration_empty_field(client):
                            data=dict(user_name='', user_email='vacationsfever2021@gmail.com',
                                      user_phone_number=1234567895, user_first_name='steff',
                                      user_last_name='steffjk', user_address='407,NYC',
-                                     user_age=21,
-                                     user_password='steff@123', confirm_password='steff@123',
+                                     user_age=22,
+                                     user_password='Steff@123', confirm_password='Steff@123',
                                      submit="Sign Up", role_assign=True,
-                                     date_of_birth="1111-11-11")
+                                     date_of_birth="2000-6-19")
                            , follow_redirects=True
                            )
     assert response.status_code == 200
@@ -39,7 +39,7 @@ def test_duplication_in_user_name_registration(client):
                                user_name='steffy', user_email='vacationsfever2021@gmail.com',
                                user_phone_number=1234567895, user_first_name='steff',
                                user_last_name='steffjk', user_address='407,NYC',
-                               user_age=21, date_of_birth="2000-12-12",
+                               user_age=21, date_of_birth="2000-6-12",
                                user_password='steff@123', confirm_password='steff@123',
                                submit="Sign Up")
                            , follow_redirects=True
@@ -55,7 +55,7 @@ def test_duplication_in_user_email_registration(client):
                                user_name='steffy', user_email='steffy.jk2018@gmail.com',
                                user_phone_number=1234567895, user_first_name='steff',
                                user_last_name='steffjk', user_address='407,NYC',
-                               user_age=21, date_of_birth="2020-11-12",
+                               user_age=22, date_of_birth="2000-11-19",
                                user_password='steff@123', confirm_password='steff@123',
                                submit="Sign Up")
                            , follow_redirects=True
@@ -70,8 +70,8 @@ def test_registration_with_admin(client, admin_login):
                                user_id=7, user_name='steff', user_email='steff@gmail.com',
                                user_phone_number=1234567894, user_first_name='steff',
                                user_last_name='steffjk', user_address='407,NYC',
-                               user_age=21, date_of_birth="2000-12-12",
-                               user_password='steff@123', confirm_password='steff@123',
+                               user_age=22, date_of_birth="2000-6-12",
+                               user_password='Steff@123', confirm_password='Steff@123',
                                role_assign=True, account_creation=True
                            ), follow_redirects=True
                            )

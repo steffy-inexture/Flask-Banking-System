@@ -40,8 +40,6 @@ def register():
             after successful registration : 'users.login' [ aka login page ]
             after unsuccessful registration : 'users.register' [ aka registration page ]
     """
-    # if PendingRollbackError:
-    #     session.rollback()
     form = RegistrationForm()
     if form.validate_on_submit():
         user_name = form.user_name.data,
@@ -56,7 +54,7 @@ def register():
         user_age = form.user_age.data,
         date_of_birth = form.date_of_birth.data
         user = User(user_name=user_name, user_password=user_password, user_email=user_email,
-                    user_phone_number=user_phone_number, user_first_name=user_first_name, user_last_name=user_last_name,
+                    u_p=user_phone_number, user_first_name=user_first_name, user_last_name=user_last_name,
                     user_address=user_address, user_age=user_age, date_of_birth=date_of_birth)
         db.session.add(user)
         try:
@@ -65,6 +63,9 @@ def register():
             db.session.rollback()
         finally:
             db.session.commit()
+
+        for i in User.query.all():
+            print(i)
 
         role_assign(user.user_id)
         account_creation(user.user_id)
