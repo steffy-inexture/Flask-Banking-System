@@ -51,8 +51,9 @@ def register():
         user_first_name = form.user_first_name.data,
         user_last_name = form.user_last_name.data,
         user_address = form.user_address.data,
-        user_age = form.user_age.data,
         date_of_birth = form.date_of_birth.data
+        today = datetime.date.today()
+        user_age = today.year - date_of_birth.year - ((today.month, today.day) < (date_of_birth.month, date_of_birth.day))
         user = User(user_name=user_name, user_password=user_password, user_email=user_email,
                     u_p=user_phone_number, user_first_name=user_first_name, user_last_name=user_last_name,
                     user_address=user_address, user_age=user_age, date_of_birth=date_of_birth)

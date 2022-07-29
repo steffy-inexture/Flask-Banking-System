@@ -20,15 +20,15 @@ class RegistrationForm(FlaskForm, CustomValidation):
     """
     user_name = StringField('Username: ', validators=[DataRequired(), Length(min=2, max=20)])
     user_email = StringField('Email: ', validators=[DataRequired(), Email()])
-    user_phone_number = IntegerField('Phone number: ', validators=[DataRequired()])
+    user_phone_number = StringField('Phone number: ', validators=[DataRequired()])
     user_first_name = StringField('First name: ', validators=[DataRequired()])
     user_last_name = StringField('Last name: ', validators=[DataRequired()])
     user_address = StringField('Address: ', validators=[DataRequired()])
-    user_age = IntegerField('Age: ', validators=[DataRequired()])
     date_of_birth = DateField('Date of birth', format='%Y-%m-%d')
     user_password = PasswordField('Password', validators=[DataRequired()])
-    confirm_password = PasswordField('confirm password', validators=[DataRequired(), EqualTo('user_password')])
+    confirm_password = PasswordField('confirm password', validators=[DataRequired()])
     submit = SubmitField('Sign Up')
+
 
     def validate_user_name(self, user_name):
         super().validate_user_name(user_name)
@@ -37,19 +37,17 @@ class RegistrationForm(FlaskForm, CustomValidation):
         super().validate_user_email(user_email)
 
     def validate_user_phone_number(self, user_phone_number):
-        if user_phone_number.data <= 0:
-            raise ValidationError('Please enter the valid number')
-        elif len(str(user_phone_number.data)) != 10:
+        if not user_phone_number.data.isdigit():
+            raise ValidationError('Phone number must be integer value only')
+        if len(str(user_phone_number.data)) != 10:
             raise ValidationError('The length must be 10 for the phone number')
+        if user_phone_number.data[0]=='0':
+            raise ValidationError('Phone number can\'t start with 0')
 
     def validate_confirm_password(self, confirm_password):
         user_password = self.user_password.data
         if confirm_password.data != user_password:
-            raise ValidationError('Confirm passwd must be equal to paasword')
-
-    def validate_user_age(self, user_age):
-        if (user_age.data) <= 0:
-            raise ValidationError('User age can not be zero or negative')
+            raise ValidationError('Confirm password must be equal to password')
 
     def validate_date_of_birth(self, date_of_birth):
         if date_of_birth.data == date.today():
@@ -57,13 +55,6 @@ class RegistrationForm(FlaskForm, CustomValidation):
         elif date_of_birth.data > date.today():
             raise ValidationError("Date must be before today")
 
-    def validate_user_age(self,user_age):
-        date_of_birth = self.date_of_birth.data
-        today = date.today()
-        age = today.year - date_of_birth.year - ((today.month, today.day) < (date_of_birth.month, date_of_birth.day))
-
-        if age!=user_age.data:
-            raise ValidationError(f"User age and DOB is not appropriate kindly check DOB & Age")
 
     def validate_user_password(self,user_password):
         SpecialSym = ['$', '@', '#', '%']
